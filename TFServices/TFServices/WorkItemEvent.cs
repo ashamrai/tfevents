@@ -12,10 +12,12 @@ namespace TFServices
         public WorkItemEventCore Core;
 
         public Dictionary<string, FieldClass> UpdatedFields;
-
-        public RevisedByClass RevisedBy;
+        public Dictionary<string, List<RelationClass>> UpdatedRelations;        
 
         public Dictionary<string, string> Fields;
+        public List<RelationClass> Relations;
+
+        public RevisedByClass RevisedBy;
 
         public int id;
         public int rev;
@@ -88,11 +90,50 @@ namespace TFServices
         [JsonProperty("fields")]
         public Dictionary<string, string> fields;
 
+        [JsonProperty("relations")]
+        public List<RelationClass> relations;
+
         [JsonProperty("_links")]
         public Dictionary<string, LinkClass> _links;
 
         [JsonProperty("url")]
         public string url;
+    }
+
+    public class RelationClass
+    {
+        [JsonProperty("rel")]
+        public string rel;
+
+        [JsonProperty("url")]
+        public string url;
+
+        [JsonProperty("attributes")]
+        public RelAttributesClass attributes;
+    }
+
+    public class RelAttributesClass
+    {
+        [JsonProperty("isLocked")]
+        public bool isLocked;
+
+        [JsonProperty("comment")]
+        public string comment;
+
+        [JsonProperty("authorizedDate")]
+        public string authorizedDate;
+
+        [JsonProperty("id")]
+        public string id;
+
+        [JsonProperty("resourceCreatedDate")]
+        public string resourceCreatedDate;
+
+        [JsonProperty("resourceModifiedDate")]
+        public string resourceModifiedDate;
+
+        [JsonProperty("revisedDate")]
+        public string revisedDate;
     }
 
     public class ResourceContainerClass
@@ -147,6 +188,9 @@ namespace TFServices
         [JsonProperty("fields")]
         public Dictionary<string, FieldClass> fields;
 
+        [JsonProperty("relations")]
+        public Dictionary<string, List<RelationClass>> relations;
+
         [JsonProperty("_links")]
         public Dictionary<string, LinkClass> _links;
 
@@ -188,6 +232,9 @@ namespace TFServices
 
         [JsonProperty("fields")]
         public Dictionary<string, string> fields;
+
+        [JsonProperty("relations")]
+        public List<RelationClass> relations;
 
         [JsonProperty("url")]
         public string url;

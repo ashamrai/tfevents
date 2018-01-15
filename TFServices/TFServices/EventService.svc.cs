@@ -28,8 +28,10 @@ namespace TFServices
             {
                 WorkItemEventUpdated _wieventUpdated = JsonConvert.DeserializeObject<WorkItemEventUpdated>(_eventStr);
                 _wievent.UpdatedFields = _wieventUpdated.resource.fields;
+                _wievent.UpdatedRelations = _wieventUpdated.resource.relations;
                 _wievent.RevisedBy = _wieventUpdated.resource.revisedBy;
                 _wievent.Fields = _wieventUpdated.resource.revision.fields;
+                _wievent.Relations = _wieventUpdated.resource.revision.relations;
                 _wievent.id = _wieventUpdated.resource.revision.id;
                 _wievent.rev = _wieventUpdated.resource.revision.rev;
                 _wievent._links = _wieventUpdated.resource._links;
@@ -38,12 +40,14 @@ namespace TFServices
             {
                 WorkItemEventCreated _wieventCreated = JsonConvert.DeserializeObject<WorkItemEventCreated>(_eventStr);
                 _wievent.Fields = _wieventCreated.resource.fields;
+                _wievent.Relations = _wieventCreated.resource.relations;
                 _wievent.id = _wieventCreated.resource.id;
                 _wievent.rev = _wieventCreated.resource.rev;
                 _wievent._links = _wieventCreated.resource._links;
             }
 
-            ProgressEvent(_wievent);
+            if (_wievent.Fields.Count > 0)
+                ProgressEvent(_wievent);
         }
 
         private void ProgressEvent(WorkItemEvent wievent)

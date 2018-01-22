@@ -47,10 +47,10 @@ namespace TFServices
             }
 
             if (_wievent.Fields.Count > 0)
-                ProgressEvent(_wievent);
+                ProcessEvent(_wievent);
         }
 
-        private void ProgressEvent(WorkItemEvent wievent)
+        private void ProcessEvent(WorkItemEvent wievent)
         {
             
         }

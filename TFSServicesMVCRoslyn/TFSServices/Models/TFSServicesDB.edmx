@@ -1,0 +1,208 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="3.0" xmlns:edmx="http://schemas.microsoft.com/ado/2009/11/edmx">
+  <!-- EF Runtime content -->
+  <edmx:Runtime>
+    <!-- SSDL content -->
+    <edmx:StorageModels>
+    <Schema Namespace="TFSServicesDB.Store" Alias="Self" Provider="System.Data.SqlClient" ProviderManifestToken="2012" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+  <EntityContainer Name="TFSServicesDBStoreContainer">
+    <EntitySet Name="RulesSet" EntityType="TFSServicesDB.Store.RulesSet" store:Type="Tables" Schema="dbo" />
+    <EntitySet Name="RuleTypeSet" EntityType="TFSServicesDB.Store.RuleTypeSet" store:Type="Tables" Schema="dbo" />
+    <EntitySet Name="WebMethodSet" EntityType="TFSServicesDB.Store.WebMethodSet" store:Type="Tables" Schema="dbo" />
+    <AssociationSet Name="RuleTypeRules" Association="TFSServicesDB.Store.RuleTypeRules">
+      <End Role="RuleType" EntitySet="RuleTypeSet" />
+      <End Role="Rules" EntitySet="RulesSet" />
+    </AssociationSet>
+    <AssociationSet Name="WebMethodRules" Association="TFSServicesDB.Store.WebMethodRules">
+      <End Role="WebMethod" EntitySet="WebMethodSet" />
+      <End Role="Rules" EntitySet="RulesSet" />
+    </AssociationSet>
+  </EntityContainer>
+  <EntityType Name="RulesSet">
+    <Key>
+      <PropertyRef Name="Id" />
+    </Key>
+    <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="IsActive" Type="bit" Nullable="false" />
+    <Property Name="Title" Type="nvarchar(max)" Nullable="false" />
+    <Property Name="Description" Type="nvarchar(max)" Nullable="false" />
+    <Property Name="TriggerScript" Type="nvarchar(max)" Nullable="false" />
+    <Property Name="ProcessScript" Type="nvarchar(max)" Nullable="false" />
+    <Property Name="RuleTypeId" Type="int" Nullable="false" />
+    <Property Name="WebMethodId" Type="int" Nullable="false" />
+  </EntityType>
+  <EntityType Name="RuleTypeSet">
+    <Key>
+      <PropertyRef Name="Id" />
+    </Key>
+    <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="Name" Type="nvarchar(max)" Nullable="false" />
+    <Property Name="Description" Type="nvarchar(max)" Nullable="true" />
+  </EntityType>
+  <EntityType Name="WebMethodSet">
+    <Key>
+      <PropertyRef Name="Id" />
+    </Key>
+    <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="Name" Type="nvarchar(max)" Nullable="false" />
+    <Property Name="Description" Type="nvarchar(max)" Nullable="true" />
+  </EntityType>
+  <Association Name="RuleTypeRules">
+    <End Role="RuleType" Type="TFSServicesDB.Store.RuleTypeSet" Multiplicity="1" />
+    <End Role="Rules" Type="TFSServicesDB.Store.RulesSet" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="RuleType">
+        <PropertyRef Name="Id" />
+      </Principal>
+      <Dependent Role="Rules">
+        <PropertyRef Name="RuleTypeId" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="WebMethodRules">
+    <End Role="WebMethod" Type="TFSServicesDB.Store.WebMethodSet" Multiplicity="1" />
+    <End Role="Rules" Type="TFSServicesDB.Store.RulesSet" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="WebMethod">
+        <PropertyRef Name="Id" />
+      </Principal>
+      <Dependent Role="Rules">
+        <PropertyRef Name="WebMethodId" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+</Schema></edmx:StorageModels>
+    <!-- CSDL content -->
+    <edmx:ConceptualModels>
+      <Schema xmlns="http://schemas.microsoft.com/ado/2009/11/edm" xmlns:cg="http://schemas.microsoft.com/ado/2006/04/codegeneration" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" Namespace="TFSServicesDB" Alias="Self" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" annotation:UseStrongSpatialTypes="false">
+        <EntityContainer Name="TFSServicesDBContainer" annotation:LazyLoadingEnabled="true">
+          <EntitySet Name="RulesSet" EntityType="TFSServicesDB.Rules" />
+          <EntitySet Name="RuleTypeSet" EntityType="TFSServicesDB.RuleType" />
+          <EntitySet Name="WebMethodSet" EntityType="TFSServicesDB.WebMethod" />
+          <AssociationSet Name="RuleTypeRules" Association="TFSServicesDB.RuleTypeRules">
+            <End Role="RuleType" EntitySet="RuleTypeSet" />
+            <End Role="Rules" EntitySet="RulesSet" />
+          </AssociationSet>
+          <AssociationSet Name="WebMethodRules" Association="TFSServicesDB.WebMethodRules">
+            <End Role="WebMethod" EntitySet="WebMethodSet" />
+            <End Role="Rules" EntitySet="RulesSet" />
+          </AssociationSet>
+        </EntityContainer>
+        <EntityType Name="Rules">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="IsActive" Type="Boolean" Nullable="false" />
+          <Property Name="Title" Type="String" Nullable="false" />
+          <Property Name="Description" Type="String" Nullable="false" />
+          <Property Name="TriggerScript" Type="String" Nullable="false" />
+          <Property Name="ProcessScript" Type="String" Nullable="false" />
+          <NavigationProperty Name="RuleType" Relationship="TFSServicesDB.RuleTypeRules" FromRole="Rules" ToRole="RuleType" />
+          <Property Name="RuleTypeId" Type="Int32" Nullable="false" />
+          <NavigationProperty Name="WebMethod" Relationship="TFSServicesDB.WebMethodRules" FromRole="Rules" ToRole="WebMethod" />
+          <Property Name="WebMethodId" Type="Int32" Nullable="false" />
+        </EntityType>
+        <EntityType Name="RuleType">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Name" Type="String" Nullable="false" />
+          <Property Name="Description" Type="String" Nullable="true" />
+          <NavigationProperty Name="Rules" Relationship="TFSServicesDB.RuleTypeRules" FromRole="RuleType" ToRole="Rules" />
+        </EntityType>
+        <EntityType Name="WebMethod">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Name" Type="String" Nullable="false" />
+          <Property Name="Description" Type="String" Nullable="true" />
+          <NavigationProperty Name="Rules" Relationship="TFSServicesDB.WebMethodRules" FromRole="WebMethod" ToRole="Rules" />
+        </EntityType>
+        <Association Name="RuleTypeRules">
+          <End Type="TFSServicesDB.RuleType" Role="RuleType" Multiplicity="1" />
+          <End Type="TFSServicesDB.Rules" Role="Rules" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="RuleType">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="Rules">
+              <PropertyRef Name="RuleTypeId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="WebMethodRules">
+          <End Type="TFSServicesDB.WebMethod" Role="WebMethod" Multiplicity="1" />
+          <End Type="TFSServicesDB.Rules" Role="Rules" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="WebMethod">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="Rules">
+              <PropertyRef Name="WebMethodId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+      </Schema>
+    </edmx:ConceptualModels>
+    <!-- C-S mapping content -->
+    <edmx:Mappings>
+    <Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs">
+  <EntityContainerMapping StorageEntityContainer="TFSServicesDBStoreContainer" CdmEntityContainer="TFSServicesDBContainer">
+    <EntitySetMapping Name="RulesSet">
+      <EntityTypeMapping TypeName="IsTypeOf(TFSServicesDB.Rules)">
+        <MappingFragment StoreEntitySet="RulesSet">
+          <ScalarProperty Name="Id" ColumnName="Id" />
+          <ScalarProperty Name="IsActive" ColumnName="IsActive" />
+          <ScalarProperty Name="Title" ColumnName="Title" />
+          <ScalarProperty Name="Description" ColumnName="Description" />
+          <ScalarProperty Name="TriggerScript" ColumnName="TriggerScript" />
+          <ScalarProperty Name="ProcessScript" ColumnName="ProcessScript" />
+          <ScalarProperty Name="RuleTypeId" ColumnName="RuleTypeId" />
+          <ScalarProperty Name="WebMethodId" ColumnName="WebMethodId" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="RuleTypeSet">
+      <EntityTypeMapping TypeName="IsTypeOf(TFSServicesDB.RuleType)">
+        <MappingFragment StoreEntitySet="RuleTypeSet">
+          <ScalarProperty Name="Id" ColumnName="Id" />
+          <ScalarProperty Name="Name" ColumnName="Name" />
+          <ScalarProperty Name="Description" ColumnName="Description" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="WebMethodSet">
+      <EntityTypeMapping TypeName="IsTypeOf(TFSServicesDB.WebMethod)">
+        <MappingFragment StoreEntitySet="WebMethodSet">
+          <ScalarProperty Name="Id" ColumnName="Id" />
+          <ScalarProperty Name="Name" ColumnName="Name" />
+          <ScalarProperty Name="Description" ColumnName="Description" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+  </EntityContainerMapping>
+</Mapping></edmx:Mappings>
+  </edmx:Runtime>
+  <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <edmx:Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
+    <edmx:Connection>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="MetadataArtifactProcessing" Value="EmbedInOutputAssembly" />
+      </DesignerInfoPropertySet>
+    </edmx:Connection>
+    <edmx:Options>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="ValidateOnBuild" Value="true" />
+        <DesignerProperty Name="EnablePluralization" Value="False" />
+        <DesignerProperty Name="CodeGenerationStrategy" Value="Нет" />
+        <DesignerProperty Name="UseLegacyProvider" Value="False" />
+      </DesignerInfoPropertySet>
+    </edmx:Options>
+    <!-- Diagram content (shape and connector positions) -->
+    <edmx:Diagrams>
+    </edmx:Diagrams>
+  </edmx:Designer>
+</edmx:Edmx>

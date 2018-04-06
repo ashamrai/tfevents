@@ -1,0 +1,296 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="3.0" xmlns:edmx="http://schemas.microsoft.com/ado/2009/11/edmx">
+  <!-- EF Runtime content -->
+  <edmx:Runtime>
+    <!-- SSDL content -->
+    <edmx:StorageModels>
+    <Schema Namespace="TFSServicesDB.Store" Alias="Self" Provider="System.Data.SqlClient" ProviderManifestToken="2012" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+  <EntityContainer Name="TFSServicesDBStoreContainer">
+    <EntitySet Name="RulesSet" EntityType="TFSServicesDB.Store.RulesSet" store:Type="Tables" Schema="dbo" />
+    <EntitySet Name="RuleTypeSet" EntityType="TFSServicesDB.Store.RuleTypeSet" store:Type="Tables" Schema="dbo" />
+    <EntitySet Name="RunHistorySet" EntityType="TFSServicesDB.Store.RunHistorySet" store:Type="Tables" Schema="dbo" />
+    <EntitySet Name="RevisionsSet" EntityType="TFSServicesDB.Store.RevisionsSet" store:Type="Tables" Schema="dbo" />
+    <AssociationSet Name="RuleTypeRules" Association="TFSServicesDB.Store.RuleTypeRules">
+      <End Role="RuleType" EntitySet="RuleTypeSet" />
+      <End Role="Rules" EntitySet="RulesSet" />
+    </AssociationSet>
+    <AssociationSet Name="RulesRunHistory" Association="TFSServicesDB.Store.RulesRunHistory">
+      <End Role="Rules" EntitySet="RulesSet" />
+      <End Role="RunHistory" EntitySet="RunHistorySet" />
+    </AssociationSet>
+    <AssociationSet Name="RulesRulesRevisions" Association="TFSServicesDB.Store.RulesRulesRevisions">
+      <End Role="Rules" EntitySet="RulesSet" />
+      <End Role="RulesRevisions" EntitySet="RevisionsSet" />
+    </AssociationSet>
+  </EntityContainer>
+  <EntityType Name="RulesSet">
+    <Key>
+      <PropertyRef Name="Id" />
+    </Key>
+    <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="IsActive" Type="bit" Nullable="false" />
+    <Property Name="Title" Type="nvarchar(max)" Nullable="false" />
+    <Property Name="Description" Type="nvarchar(max)" Nullable="false" />
+    <Property Name="TriggerScript" Type="nvarchar(max)" Nullable="false" />
+    <Property Name="ProcessScript" Type="nvarchar(max)" Nullable="false" />
+    <Property Name="RuleTypeId" Type="int" Nullable="false" />
+    <Property Name="Revision" Type="int" Nullable="false" DefaultValue="1" />
+    <Property Name="IsDeleted" Type="bit" Nullable="false" DefaultValue="false" />
+  </EntityType>
+  <EntityType Name="RuleTypeSet">
+    <Key>
+      <PropertyRef Name="Id" />
+    </Key>
+    <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="Name" Type="nvarchar(max)" Nullable="false" />
+    <Property Name="Description" Type="nvarchar(max)" Nullable="true" />
+  </EntityType>
+  <EntityType Name="RunHistorySet">
+    <Key>
+      <PropertyRef Name="Id" />
+    </Key>
+    <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="Date" Type="datetime" Nullable="false" />
+    <Property Name="Result" Type="nvarchar(max)" Nullable="false" />
+    <Property Name="RulesId" Type="int" Nullable="false" />
+    <Property Name="RuleRevision" Type="nvarchar(max)" Nullable="false" />
+    <Property Name="Message" Type="nvarchar(max)" Nullable="false" />
+  </EntityType>
+  <EntityType Name="RevisionsSet">
+    <Key>
+      <PropertyRef Name="Id" />
+    </Key>
+    <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="Date" Type="datetime" Nullable="false" />
+    <Property Name="UserName" Type="nvarchar(max)" Nullable="false" />
+    <Property Name="TriggerScript" Type="nvarchar(max)" Nullable="false" />
+    <Property Name="ProcessScript" Type="nvarchar(max)" Nullable="false" />
+    <Property Name="RulesId" Type="int" Nullable="false" />
+    <Property Name="Revision" Type="int" Nullable="false" />
+    <Property Name="Operation" Type="nvarchar" Nullable="false" MaxLength="10" />
+  </EntityType>
+  <Association Name="RuleTypeRules">
+    <End Role="RuleType" Type="TFSServicesDB.Store.RuleTypeSet" Multiplicity="1" />
+    <End Role="Rules" Type="TFSServicesDB.Store.RulesSet" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="RuleType">
+        <PropertyRef Name="Id" />
+      </Principal>
+      <Dependent Role="Rules">
+        <PropertyRef Name="RuleTypeId" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="RulesRunHistory">
+    <End Role="Rules" Type="TFSServicesDB.Store.RulesSet" Multiplicity="1" />
+    <End Role="RunHistory" Type="TFSServicesDB.Store.RunHistorySet" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="Rules">
+        <PropertyRef Name="Id" />
+      </Principal>
+      <Dependent Role="RunHistory">
+        <PropertyRef Name="RulesId" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="RulesRulesRevisions">
+    <End Role="Rules" Type="TFSServicesDB.Store.RulesSet" Multiplicity="1" />
+    <End Role="RulesRevisions" Type="TFSServicesDB.Store.RevisionsSet" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="Rules">
+        <PropertyRef Name="Id" />
+      </Principal>
+      <Dependent Role="RulesRevisions">
+        <PropertyRef Name="RulesId" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+</Schema></edmx:StorageModels>
+    <!-- CSDL content -->
+    <edmx:ConceptualModels>
+      <Schema xmlns="http://schemas.microsoft.com/ado/2009/11/edm" xmlns:cg="http://schemas.microsoft.com/ado/2006/04/codegeneration" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" Namespace="TFSServicesDB" Alias="Self" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" annotation:UseStrongSpatialTypes="false">
+        <EntityContainer Name="TFSServicesDBContainer" annotation:LazyLoadingEnabled="true">
+          <EntitySet Name="RulesSet" EntityType="TFSServicesDB.Rules" />
+          <EntitySet Name="RuleTypeSet" EntityType="TFSServicesDB.RuleType" />
+          <AssociationSet Name="RuleTypeRules" Association="TFSServicesDB.RuleTypeRules">
+            <End Role="RuleType" EntitySet="RuleTypeSet" />
+            <End Role="Rules" EntitySet="RulesSet" />
+          </AssociationSet>
+          <EntitySet Name="RunHistorySet" EntityType="TFSServicesDB.RunHistory" />
+          <AssociationSet Name="RulesRunHistory" Association="TFSServicesDB.RulesRunHistory">
+            <End Role="Rules" EntitySet="RulesSet" />
+            <End Role="RunHistory" EntitySet="RunHistorySet" />
+          </AssociationSet>
+          <EntitySet Name="RevisionsSet" EntityType="TFSServicesDB.Revisions" />
+          <AssociationSet Name="RulesRulesRevisions" Association="TFSServicesDB.RulesRulesRevisions">
+            <End Role="Rules" EntitySet="RulesSet" />
+            <End Role="RulesRevisions" EntitySet="RevisionsSet" />
+          </AssociationSet>
+        </EntityContainer>
+        <EntityType Name="Rules">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="IsActive" Type="Boolean" Nullable="false" />
+          <Property Name="Title" Type="String" Nullable="false" />
+          <Property Name="Description" Type="String" Nullable="false" />
+          <Property Name="TriggerScript" Type="String" Nullable="false" />
+          <Property Name="ProcessScript" Type="String" Nullable="false" />
+          <NavigationProperty Name="RuleType" Relationship="TFSServicesDB.RuleTypeRules" FromRole="Rules" ToRole="RuleType" />
+          <Property Name="RuleTypeId" Type="Int32" Nullable="false" />
+          <NavigationProperty Name="RunHistory" Relationship="TFSServicesDB.RulesRunHistory" FromRole="Rules" ToRole="RunHistory" />
+          <Property Name="Revision" Type="Int32" Nullable="false" DefaultValue="1" />
+          <NavigationProperty Name="RulesRevisions" Relationship="TFSServicesDB.RulesRulesRevisions" FromRole="Rules" ToRole="RulesRevisions" />
+          <Property Name="IsDeleted" Type="Boolean" Nullable="false" DefaultValue="false" />
+        </EntityType>
+        <EntityType Name="RuleType">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Name" Type="String" Nullable="false" />
+          <Property Name="Description" Type="String" Nullable="true" />
+          <NavigationProperty Name="Rules" Relationship="TFSServicesDB.RuleTypeRules" FromRole="RuleType" ToRole="Rules" />
+        </EntityType>
+        <Association Name="RuleTypeRules">
+          <End Type="TFSServicesDB.RuleType" Role="RuleType" Multiplicity="1" />
+          <End Type="TFSServicesDB.Rules" Role="Rules" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="RuleType">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="Rules">
+              <PropertyRef Name="RuleTypeId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <EntityType Name="RunHistory">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Date" Type="DateTime" Nullable="false" />
+          <Property Name="Result" Type="String" Nullable="false" />
+          <NavigationProperty Name="Rules" Relationship="TFSServicesDB.RulesRunHistory" FromRole="RunHistory" ToRole="Rules" />
+          <Property Name="RulesId" Type="Int32" Nullable="false" />
+          <Property Name="RuleRevision" Type="String" Nullable="false" />
+          <Property Name="Message" Type="String" Nullable="false" />
+        </EntityType>
+        <Association Name="RulesRunHistory">
+          <End Type="TFSServicesDB.Rules" Role="Rules" Multiplicity="1" />
+          <End Type="TFSServicesDB.RunHistory" Role="RunHistory" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Rules">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="RunHistory">
+              <PropertyRef Name="RulesId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <EntityType Name="Revisions">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Date" Type="DateTime" Nullable="false" />
+          <Property Name="UserName" Type="String" Nullable="false" />
+          <Property Name="TriggerScript" Type="String" Nullable="false" />
+          <Property Name="ProcessScript" Type="String" Nullable="false" />
+          <NavigationProperty Name="Rules" Relationship="TFSServicesDB.RulesRulesRevisions" FromRole="RulesRevisions" ToRole="Rules" />
+          <Property Name="RulesId" Type="Int32" Nullable="false" />
+          <Property Name="Revision" Type="Int32" Nullable="false" />
+          <Property Name="Operation" Type="String" Nullable="false" MaxLength="10" />
+        </EntityType>
+        <Association Name="RulesRulesRevisions">
+          <End Type="TFSServicesDB.Rules" Role="Rules" Multiplicity="1" />
+          <End Type="TFSServicesDB.Revisions" Role="RulesRevisions" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Rules">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="RulesRevisions">
+              <PropertyRef Name="RulesId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+      </Schema>
+    </edmx:ConceptualModels>
+    <!-- C-S mapping content -->
+    <edmx:Mappings>
+    <Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs">
+  <EntityContainerMapping StorageEntityContainer="TFSServicesDBStoreContainer" CdmEntityContainer="TFSServicesDBContainer">
+    <EntitySetMapping Name="RulesSet">
+      <EntityTypeMapping TypeName="IsTypeOf(TFSServicesDB.Rules)">
+        <MappingFragment StoreEntitySet="RulesSet">
+          <ScalarProperty Name="Id" ColumnName="Id" />
+          <ScalarProperty Name="IsActive" ColumnName="IsActive" />
+          <ScalarProperty Name="Title" ColumnName="Title" />
+          <ScalarProperty Name="Description" ColumnName="Description" />
+          <ScalarProperty Name="TriggerScript" ColumnName="TriggerScript" />
+          <ScalarProperty Name="ProcessScript" ColumnName="ProcessScript" />
+          <ScalarProperty Name="RuleTypeId" ColumnName="RuleTypeId" />
+          <ScalarProperty Name="Revision" ColumnName="Revision" />
+          <ScalarProperty Name="IsDeleted" ColumnName="IsDeleted" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="RuleTypeSet">
+      <EntityTypeMapping TypeName="IsTypeOf(TFSServicesDB.RuleType)">
+        <MappingFragment StoreEntitySet="RuleTypeSet">
+          <ScalarProperty Name="Id" ColumnName="Id" />
+          <ScalarProperty Name="Name" ColumnName="Name" />
+          <ScalarProperty Name="Description" ColumnName="Description" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="RunHistorySet">
+      <EntityTypeMapping TypeName="IsTypeOf(TFSServicesDB.RunHistory)">
+        <MappingFragment StoreEntitySet="RunHistorySet">
+          <ScalarProperty Name="Id" ColumnName="Id" />
+          <ScalarProperty Name="Date" ColumnName="Date" />
+          <ScalarProperty Name="Result" ColumnName="Result" />
+          <ScalarProperty Name="RulesId" ColumnName="RulesId" />
+          <ScalarProperty Name="RuleRevision" ColumnName="RuleRevision" />
+          <ScalarProperty Name="Message" ColumnName="Message" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="RevisionsSet">
+      <EntityTypeMapping TypeName="IsTypeOf(TFSServicesDB.Revisions)">
+        <MappingFragment StoreEntitySet="RevisionsSet">
+          <ScalarProperty Name="Id" ColumnName="Id" />
+          <ScalarProperty Name="Date" ColumnName="Date" />
+          <ScalarProperty Name="UserName" ColumnName="UserName" />
+          <ScalarProperty Name="TriggerScript" ColumnName="TriggerScript" />
+          <ScalarProperty Name="ProcessScript" ColumnName="ProcessScript" />
+          <ScalarProperty Name="RulesId" ColumnName="RulesId" />
+          <ScalarProperty Name="Revision" ColumnName="Revision" />
+          <ScalarProperty Name="Operation" ColumnName="Operation" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+  </EntityContainerMapping>
+</Mapping></edmx:Mappings>
+  </edmx:Runtime>
+  <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <edmx:Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
+    <edmx:Connection>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="MetadataArtifactProcessing" Value="EmbedInOutputAssembly" />
+      </DesignerInfoPropertySet>
+    </edmx:Connection>
+    <edmx:Options>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="ValidateOnBuild" Value="true" />
+        <DesignerProperty Name="EnablePluralization" Value="False" />
+        <DesignerProperty Name="CodeGenerationStrategy" Value="Нет" />
+        <DesignerProperty Name="UseLegacyProvider" Value="False" />
+      </DesignerInfoPropertySet>
+    </edmx:Options>
+    <!-- Diagram content (shape and connector positions) -->
+    <edmx:Diagrams>
+    </edmx:Diagrams>
+  </edmx:Designer>
+</edmx:Edmx>

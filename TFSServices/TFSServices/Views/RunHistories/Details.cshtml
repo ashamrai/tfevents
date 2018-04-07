@@ -39,7 +39,7 @@
         </dt>
 
         <dd>
-                    @Html.TextAreaFor(model => model.Message, 40, 40, new { htmlAttributes = new { @readonly = "readonly" } })
+            @Html.TextAreaFor(model => model.Message, 40, 100, new { @readonly = true })
         </dd>
 
         <dt>

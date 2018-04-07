@@ -39,7 +39,7 @@
         </dt>
 
         <dd>
-            @Html.DisplayFor(model => model.TriggerScript)
+            @Html.TextAreaFor(model => model.TriggerScript, 40, 100, new { @readonly = true })
         </dd>
 
         <dt>
@@ -47,7 +47,7 @@
         </dt>
 
         <dd>
-            @Html.DisplayFor(model => model.ProcessScript)
+            @Html.TextAreaFor(model => model.ProcessScript, 40, 100, new { @readonly = true })
         </dd>
 
     </dl>

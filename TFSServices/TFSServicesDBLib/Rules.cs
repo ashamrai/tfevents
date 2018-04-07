@@ -17,7 +17,6 @@ namespace TFSServicesDBLib
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
         public Rules()
         {
-            this.Revision = 1;
             this.IsDeleted = false;
             this.RunHistory = new HashSet<RunHistory>();
             this.RulesRevisions = new HashSet<Revisions>();

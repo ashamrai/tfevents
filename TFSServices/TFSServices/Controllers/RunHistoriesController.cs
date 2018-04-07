@@ -10,137 +10,113 @@ using TFSServicesDBLib;
 
 namespace TFSServices.Controllers
 {
-    public class RulesController : Controller
+    public class RunHistoriesController : Controller
     {
         private TFSServicesDBContainer db = new TFSServicesDBContainer();
 
-        // GET: Rules
+        // GET: RunHistories
         public ActionResult Index()
         {
-            return View(db.RulesSet.Where(r => r.IsDeleted == false).ToList());
+            var runHistorySet = db.RunHistorySet.Include(r => r.Rules);
+            return View(runHistorySet.ToList());
         }
 
-        // GET: Rules/Details/5
+        // GET: RunHistories/Details/5
         public ActionResult Details(int? id)
         {
             if (id == null)
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            Rules rules = db.RulesSet.Find(id);
-            if (rules == null)
+            RunHistory runHistory = db.RunHistorySet.Find(id);
+            if (runHistory == null)
             {
                 return HttpNotFound();
             }
-            return View(rules);
+            return View(runHistory);
         }
 
-        // GET: Rules/Create
+        // GET: RunHistories/Create
         public ActionResult Create()
         {
-            ViewBag.RuleTypeList = new SelectList(db.RuleTypeSet, "Id", "Name");
-
+            ViewBag.RulesId = new SelectList(db.RulesSet, "Id", "Title");
             return View();
         }
 
-        // POST: Rules/Create
+        // POST: RunHistories/Create
         // Чтобы защититься от атак чрезмерной передачи данных, включите определенные свойства, для которых следует установить привязку. Дополнительные 
         // сведения см. в статье https://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Create([Bind(Include = "Id,IsActive,Title,Description,TriggerScript,ProcessScript,RuleTypeId")] Rules rules)
+        public ActionResult Create([Bind(Include = "Id,Date,Result,RulesId,RuleRevision,Message")] RunHistory runHistory)
         {
-
             if (ModelState.IsValid)
             {
-
-                rules.Revision = 1;
-                db.RulesSet.Add(rules);
+                db.RunHistorySet.Add(runHistory);
                 db.SaveChanges();
-                AddRevision(rules, "Create");
                 return RedirectToAction("Index");
             }
 
-            return View(rules);
+            ViewBag.RulesId = new SelectList(db.RulesSet, "Id", "Title", runHistory.RulesId);
+            return View(runHistory);
         }
 
-        private void AddRevision(Rules pRule, string pOperation)
-        {
-            Revisions _rev = new Revisions();
-            _rev.Date = DateTime.Now;
-            _rev.Revision = pRule.Revision;
-            _rev.TriggerScript = pRule.TriggerScript;
-            _rev.ProcessScript = pRule.ProcessScript;
-            _rev.Rules = pRule;
-            _rev.UserName = this.User.Identity.Name;
-            _rev.Operation = pOperation;
-            db.RevisionsSet.Add(_rev);
-            db.SaveChanges();
-        }
-
-        // GET: Rules/Edit/5
+        // GET: RunHistories/Edit/5
         public ActionResult Edit(int? id)
         {
-            ViewBag.RuleTypeList = new SelectList(db.RuleTypeSet, "Id", "Name");
-
             if (id == null)
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            Rules rules = db.RulesSet.Find(id);
-            if (rules == null)
+            RunHistory runHistory = db.RunHistorySet.Find(id);
+            if (runHistory == null)
             {
                 return HttpNotFound();
             }
-            return View(rules);
+            ViewBag.RulesId = new SelectList(db.RulesSet, "Id", "Title", runHistory.RulesId);
+            return View(runHistory);
         }
 
-        // POST: Rules/Edit/5
+        // POST: RunHistories/Edit/5
         // Чтобы защититься от атак чрезмерной передачи данных, включите определенные свойства, для которых следует установить привязку. Дополнительные 
         // сведения см. в статье https://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Edit([Bind(Include = "Id,Revision,IsActive,Title,Description,TriggerScript,ProcessScript,RuleTypeId")] Rules rules)
+        public ActionResult Edit([Bind(Include = "Id,Date,Result,RulesId,RuleRevision,Message")] RunHistory runHistory)
         {
             if (ModelState.IsValid)
             {
-                rules.Revision = rules.Revision + 1;
-                db.Entry(rules).State = EntityState.Modified;
+                db.Entry(runHistory).State = EntityState.Modified;
                 db.SaveChanges();
-                AddRevision(rules, "Edit");
                 return RedirectToAction("Index");
             }
-            return View(rules);
+            ViewBag.RulesId = new SelectList(db.RulesSet, "Id", "Title", runHistory.RulesId);
+            return View(runHistory);
         }
 
-        // GET: Rules/Delete/5
+        // GET: RunHistories/Delete/5
         public ActionResult Delete(int? id)
         {
             if (id == null)
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            Rules rules = db.RulesSet.Find(id);
-            if (rules == null)
+            RunHistory runHistory = db.RunHistorySet.Find(id);
+            if (runHistory == null)
             {
                 return HttpNotFound();
             }
-            return View(rules);
+            return View(runHistory);
         }
 
-        // POST: Rules/Delete/5
+        // POST: RunHistories/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public ActionResult DeleteConfirmed(int id)
         {
-            Rules rules = db.RulesSet.Find(id);
-            rules.IsDeleted = true;
-            rules.IsActive = false;
-            db.RulesSet.Remove(rules);
-            db.Entry(rules).State = EntityState.Modified;
+            RunHistory runHistory = db.RunHistorySet.Find(id);
+            db.RunHistorySet.Remove(runHistory);
             db.SaveChanges();
-            Revisions _rev = new Revisions();
-            AddRevision(rules, "Delete");
             return RedirectToAction("Index");
         }
 

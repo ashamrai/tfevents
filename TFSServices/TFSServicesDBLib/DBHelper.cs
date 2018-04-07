@@ -6,17 +6,40 @@ using System.Threading.Tasks;
 
 namespace TFSServicesDBLib
 {
-    public static class DBHelper
+    public class DBHelper
     {
-        public static List<Rules> GetRulesByType(string pRuleType)
-        {
-            var _context = new TFSServicesDBContainer();
+        public TFSServicesDBContainer DB = new TFSServicesDBContainer();
 
-            var _query = from rls in _context.RulesSet where rls.RuleType.Name == pRuleType && rls.IsActive == true select rls;
+        public List<Rules> GetRulesByType(string pRuleType)
+        {
+            var _query = from rls in DB.RulesSet where rls.RuleType.Name == pRuleType && rls.IsActive == true select rls;
 
             if (_query.Count() == 0) return null;
 
             return _query.ToList();
+        }
+
+        public string AddRunHistory(Rules pRule, string pResult, string pMessage)
+        {
+            string _retMessage = "";
+
+            try
+            {
+                RunHistory _runh = new RunHistory();
+                _runh.Date = DateTime.Now;
+                _runh.Result = pResult;
+                _runh.Message = pMessage;
+                _runh.Rules = pRule;
+                _runh.RuleRevision = pRule.Revision;
+                DB.RunHistorySet.Add(_runh);
+                DB.SaveChanges();
+            }
+            catch(Exception ex)
+            {
+                _retMessage += ex.Message + "\n\n" + ex.StackTrace;
+            }
+
+            return _retMessage;
         }
     }
 }

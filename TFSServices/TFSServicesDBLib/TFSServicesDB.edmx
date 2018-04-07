@@ -34,7 +34,7 @@
     <Property Name="TriggerScript" Type="nvarchar(max)" Nullable="false" />
     <Property Name="ProcessScript" Type="nvarchar(max)" Nullable="false" />
     <Property Name="RuleTypeId" Type="int" Nullable="false" />
-    <Property Name="Revision" Type="int" Nullable="false" DefaultValue="1" />
+    <Property Name="Revision" Type="int" Nullable="false" />
     <Property Name="IsDeleted" Type="bit" Nullable="false" DefaultValue="false" />
   </EntityType>
   <EntityType Name="RuleTypeSet">
@@ -53,7 +53,7 @@
     <Property Name="Date" Type="datetime" Nullable="false" />
     <Property Name="Result" Type="nvarchar(max)" Nullable="false" />
     <Property Name="RulesId" Type="int" Nullable="false" />
-    <Property Name="RuleRevision" Type="nvarchar(max)" Nullable="false" />
+    <Property Name="RuleRevision" Type="int" Nullable="false" />
     <Property Name="Message" Type="nvarchar(max)" Nullable="false" />
   </EntityType>
   <EntityType Name="RevisionsSet">
@@ -140,7 +140,7 @@
           <NavigationProperty Name="RuleType" Relationship="TFSServicesDB.RuleTypeRules" FromRole="Rules" ToRole="RuleType" />
           <Property Name="RuleTypeId" Type="Int32" Nullable="false" />
           <NavigationProperty Name="RunHistory" Relationship="TFSServicesDB.RulesRunHistory" FromRole="Rules" ToRole="RunHistory" />
-          <Property Name="Revision" Type="Int32" Nullable="false" DefaultValue="1" />
+          <Property Name="Revision" Type="Int32" Nullable="false" />
           <NavigationProperty Name="RulesRevisions" Relationship="TFSServicesDB.RulesRulesRevisions" FromRole="Rules" ToRole="RulesRevisions" />
           <Property Name="IsDeleted" Type="Boolean" Nullable="false" DefaultValue="false" />
         </EntityType>
@@ -174,7 +174,7 @@
           <Property Name="Result" Type="String" Nullable="false" />
           <NavigationProperty Name="Rules" Relationship="TFSServicesDB.RulesRunHistory" FromRole="RunHistory" ToRole="Rules" />
           <Property Name="RulesId" Type="Int32" Nullable="false" />
-          <Property Name="RuleRevision" Type="String" Nullable="false" />
+          <Property Name="RuleRevision" Type="Int32" Nullable="false" />
           <Property Name="Message" Type="String" Nullable="false" />
         </EntityType>
         <Association Name="RulesRunHistory">

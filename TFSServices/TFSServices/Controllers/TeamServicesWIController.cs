@@ -27,7 +27,9 @@ namespace TFSServices.Controllers
         [HttpPost]
         public void Post([FromBody]TFTypesLib.WorkItemEvent.WorkItemEventUpdated value)
         {
-            ScriptsEngineLib.ScriptsEngine.ProcessWokItemUpdatedEvent(value);
+            var _srcs = new ScriptsEngineLib.ScriptsEngine();
+            _srcs.Debug = Properties.Settings.Default.Debug;
+            _srcs.ProcessWokItemUpdatedEvent(value);
         }
     }
 }

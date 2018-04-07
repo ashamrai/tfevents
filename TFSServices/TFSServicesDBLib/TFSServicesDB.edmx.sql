@@ -2,7 +2,7 @@
 -- --------------------------------------------------
 -- Entity Designer DDL Script for SQL Server 2005, 2008, 2012 and Azure
 -- --------------------------------------------------
--- Date Created: 04/06/2018 23:06:38
+-- Date Created: 04/07/2018 17:21:05
 -- Generated from EDMX file: C:\Users\useradmin\Source\Repos\tfevents\TFSServices\TFSServicesDBLib\TFSServicesDB.edmx
 -- --------------------------------------------------
 
@@ -76,7 +76,7 @@ CREATE TABLE [dbo].[RunHistorySet] (
     [Date] datetime  NOT NULL,
     [Result] nvarchar(max)  NOT NULL,
     [RulesId] int  NOT NULL,
-    [RuleRevision] nvarchar(max)  NOT NULL,
+    [RuleRevision] int  NOT NULL,
     [Message] nvarchar(max)  NOT NULL
 );
 GO
@@ -178,6 +178,7 @@ INSERT INTO [dbo].[RuleTypeSet]
            ('WorkItemUpdated',
            'Rules for changing of work item')
 GO
+
 -- --------------------------------------------------
 -- Script has ended
 -- --------------------------------------------------

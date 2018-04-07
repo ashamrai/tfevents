@@ -166,13 +166,20 @@
     <Compile Include="App_Start\RouteConfig.cs" />
     <Compile Include="App_Start\WebApiConfig.cs" />
     <Compile Include="Controllers\HomeController.cs" />
+    <Compile Include="Controllers\RevisionsController.cs" />
     <Compile Include="Controllers\RulesController.cs" />
     <Compile Include="Controllers\RuleTypesController.cs" />
+    <Compile Include="Controllers\RunHistoriesController.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="Controllers\TeamServicesWIController.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Properties\Settings.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+      <DependentUpon>Settings.settings</DependentUpon>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <Content Include="Content\bootstrap-grid.css" />
@@ -209,6 +216,10 @@
     <Content Include="Scripts\esm\popper.js.map" />
     <Content Include="Scripts\esm\popper-utils.min.js.map" />
     <Content Include="Scripts\esm\popper-utils.js.map" />
+    <None Include="Properties\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
     <None Include="Scripts\jquery-3.3.1.intellisense.js" />
     <Content Include="Scripts\jquery-3.3.1.js" />
     <Content Include="Scripts\jquery-3.3.1.min.js" />
@@ -265,6 +276,16 @@
     <Content Include="Views\Rules\Details.cshtml" />
     <Content Include="Views\Rules\Edit.cshtml" />
     <Content Include="Views\Rules\Index.cshtml" />
+    <Content Include="Views\Revisions\Create.cshtml" />
+    <Content Include="Views\Revisions\Delete.cshtml" />
+    <Content Include="Views\Revisions\Details.cshtml" />
+    <Content Include="Views\Revisions\Edit.cshtml" />
+    <Content Include="Views\Revisions\Index.cshtml" />
+    <Content Include="Views\RunHistories\Create.cshtml" />
+    <Content Include="Views\RunHistories\Delete.cshtml" />
+    <Content Include="Views\RunHistories\Details.cshtml" />
+    <Content Include="Views\RunHistories\Edit.cshtml" />
+    <Content Include="Views\RunHistories\Index.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

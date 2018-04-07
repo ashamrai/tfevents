@@ -1,0 +1,73 @@
+﻿@model TFSServicesDBLib.Revisions
+
+@{
+    ViewBag.Title = "Details";
+}
+
+<h2>Details</h2>
+
+<div>
+    <h4>Revisions</h4>
+    <hr />
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayNameFor(model => model.Date)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Date)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.UserName)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.UserName)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.TriggerScript)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.TriggerScript)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.ProcessScript)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.ProcessScript)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.Revision)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Revision)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.Operation)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Operation)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.Rules.Title)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Rules.Title)
+        </dd>
+
+    </dl>
+</div>
+<p>
+    @Html.ActionLink("Back to List", "Index")
+</p>

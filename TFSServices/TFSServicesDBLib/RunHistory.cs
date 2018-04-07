@@ -18,7 +18,7 @@ namespace TFSServicesDBLib
         public System.DateTime Date { get; set; }
         public string Result { get; set; }
         public int RulesId { get; set; }
-        public string RuleRevision { get; set; }
+        public int RuleRevision { get; set; }
         public string Message { get; set; }
     
         public virtual Rules Rules { get; set; }

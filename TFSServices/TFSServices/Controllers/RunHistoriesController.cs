@@ -6,6 +6,7 @@ using System.Linq;
 using System.Net;
 using System.Web;
 using System.Web.Mvc;
+using PagedList;
 using TFSServicesDBLib;
 
 namespace TFSServices.Controllers
@@ -15,10 +16,12 @@ namespace TFSServices.Controllers
         private TFSServicesDBContainer db = new TFSServicesDBContainer();
 
         // GET: RunHistories
-        public ActionResult Index()
+        public ActionResult Index(int? page)
         {
-            var runHistorySet = db.RunHistorySet.Include(r => r.Rules);
-            return View(runHistorySet.ToList());
+            int pageSize = 50;
+            int pageNumber = (page ?? 1);
+            var runHistorySet = db.RunHistorySet.Include(r => r.Rules).OrderByDescending(h => h.Date);
+            return View(runHistorySet.ToPagedList(pageNumber, pageSize));
         }
 
         // GET: RunHistories/Details/5

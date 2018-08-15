@@ -28,11 +28,12 @@
         <p>@Html.ActionLink("Run history", "Index", "RunHistories")</p>
     </div>
     <div class="col-md-4">
-        <h2>Web Hosting</h2>
-        <p>Additional information</p>
+        <h2>Additional information</h2>
+
         <p>
-            @Html.ActionLink("List of RuleTypes", "Index", "RuleTypes")<br />
-                @Html.ActionLink("Rules revisions", "Index", "Revisions")
-            </p>
+            @Html.ActionLink("List of RuleTypes", "Index", "RuleTypes")
+            <br />@Html.ActionLink("Schedule Types", "Index", "ScheduleTypes")
+            <br />@Html.ActionLink("Rules revisions", "Index", "Revisions")
+        </p>
     </div>
 </div>

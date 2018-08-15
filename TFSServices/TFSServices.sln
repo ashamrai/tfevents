@@ -5,13 +5,15 @@ VisualStudioVersion = 15.0.27130.2036
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TFSServices", "TFSServices\TFSServices.csproj", "{C0B3768E-660A-4AF8-A124-E692240E972D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TFTypesLib", "TFTypesLib\TFTypesLib.csproj", "{7A5C47DC-2ED7-4D43-9839-F7918B0041CE}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TFHelper", "TFTypesLib\TFHelper.csproj", "{7A5C47DC-2ED7-4D43-9839-F7918B0041CE}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ScriptsEngineLib", "ScriptsEngineLib\ScriptsEngineLib.csproj", "{07304E37-647C-4835-ABE4-7E55D76F177A}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConsoleTestScript", "ConsoleTestScript\ConsoleTestScript.csproj", "{DC32D468-56B0-4430-94F5-2F68858A2EEF}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TFSServicesDBLib", "TFSServicesDBLib\TFSServicesDBLib.csproj", "{90F65D42-CE10-41FC-BB4E-959AFAAC1D3C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TFTaskService", "TFTaskService\TFTaskService.csproj", "{84D2AFC2-3C02-404C-A37D-5DA9942E500D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -61,6 +63,14 @@ Global
 		{90F65D42-CE10-41FC-BB4E-959AFAAC1D3C}.Release|Any CPU.Build.0 = Release|Any CPU
 		{90F65D42-CE10-41FC-BB4E-959AFAAC1D3C}.Release|x64.ActiveCfg = Release|Any CPU
 		{90F65D42-CE10-41FC-BB4E-959AFAAC1D3C}.Release|x64.Build.0 = Release|Any CPU
+		{84D2AFC2-3C02-404C-A37D-5DA9942E500D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{84D2AFC2-3C02-404C-A37D-5DA9942E500D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{84D2AFC2-3C02-404C-A37D-5DA9942E500D}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{84D2AFC2-3C02-404C-A37D-5DA9942E500D}.Debug|x64.Build.0 = Debug|Any CPU
+		{84D2AFC2-3C02-404C-A37D-5DA9942E500D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{84D2AFC2-3C02-404C-A37D-5DA9942E500D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{84D2AFC2-3C02-404C-A37D-5DA9942E500D}.Release|x64.ActiveCfg = Release|Any CPU
+		{84D2AFC2-3C02-404C-A37D-5DA9942E500D}.Release|x64.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

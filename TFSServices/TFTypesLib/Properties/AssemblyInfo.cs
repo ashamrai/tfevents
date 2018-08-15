@@ -5,11 +5,11 @@ using System.Runtime.InteropServices;
 // Общие сведения об этой сборке предоставляются следующим набором
 // набора атрибутов. Измените значения этих атрибутов, чтобы изменить сведения,
 // связанные со сборкой.
-[assembly: AssemblyTitle("TFTypesLib")]
+[assembly: AssemblyTitle("TFHelper")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Microsoft Corporation")]
-[assembly: AssemblyProduct("TFTypesLib")]
+[assembly: AssemblyProduct("TFHelper")]
 [assembly: AssemblyCopyright("Copyright © Microsoft Corporation 2018")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]

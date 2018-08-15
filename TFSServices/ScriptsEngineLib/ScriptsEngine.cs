@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 using Microsoft.CodeAnalysis.CSharp.Scripting;
@@ -9,7 +10,7 @@ using Microsoft.VisualStudio.Services.Common;
 using Microsoft.VisualStudio.Services.WebApi;
 using Microsoft.VisualStudio.Services.WebApi.Patch;
 using Microsoft.VisualStudio.Services.WebApi.Patch.Json;
-using TFTypesLib;
+using TFHelper;
 
 namespace ScriptsEngineLib
 {
@@ -17,6 +18,8 @@ namespace ScriptsEngineLib
     {
         TFSServicesDBLib.DBHelper DBConnection = new TFSServicesDBLib.DBHelper();
         public bool Debug = false;
+        string ServiceUrl = "";
+        string PAT = "";
 
         public class ScriptWiUpdatedHost
         {
@@ -26,6 +29,12 @@ namespace ScriptsEngineLib
         public class ScriptIntHost
         {
             public int InputWorkItem { get; set; }
+        }
+
+        public ScriptsEngine(string pServiceUrl, string pPAT)
+        {
+            ServiceUrl = pServiceUrl;
+            PAT = pPAT;
         }
 
         public  void TestMethod(WorkItemEvent.WorkItemEventUpdated pInputWorkItem)
@@ -66,7 +75,7 @@ namespace ScriptsEngineLib
                     ).AddImports(
                     "System",
                     "System.Collections.Generic",
-                    "TFTypesLib"
+                    "TFHelperLib"
                     );
 
                 string _srcHeader = @"bool CheckConditionUpdated(WorkItemEvent.WorkItemEventUpdated InputWorkItem){
@@ -112,7 +121,7 @@ CheckConditionUpdated(InputWorkItem)";
                     "Microsoft.VisualStudio.Services.WebApi.Patch",
                     "Microsoft.VisualStudio.Services.Common",
                     "System",
-                    "TFTypesLib"
+                    "TFHelper"
                     );
 
 
@@ -136,5 +145,65 @@ ProcessEvent(InputWorkItem)";
             return _result;
         }
 
+
+        public bool RunTaskScript(int pTaskId)
+        {
+            bool _result = false;
+
+            TFSServicesDBLib.Rules _rule = DBConnection.GetRuleById(pTaskId);
+
+            if (_rule == null)
+            {
+                DBConnection.AddRunHistory(null, "Can not find the rule Id: " + pTaskId, "");
+                return false;
+            }
+
+            try
+            {
+                if (Debug) DBConnection.AddRunHistory(_rule, "Start run", "");
+
+                var _scrOpt = ScriptOptions.Default.AddReferences(
+                    Assembly.GetAssembly(typeof(WorkItemTrackingHttpClient)),
+                    Assembly.GetAssembly(typeof(JsonPatchDocument)),
+                    Assembly.GetAssembly(typeof(VssConnection)),
+                    Assembly.GetAssembly(typeof(VssBasicCredential)),
+                    Assembly.GetAssembly(typeof(Uri)),
+                    Assembly.GetAssembly(typeof(TFClientHelper)),
+                     Assembly.GetAssembly(typeof(Dictionary<string, string>))
+                    ).AddImports(
+                    "Microsoft.TeamFoundation.WorkItemTracking.WebApi",
+                    "Microsoft.TeamFoundation.WorkItemTracking.WebApi.Models",
+                    "Microsoft.VisualStudio.Services.WebApi.Patch.Json",
+                    "Microsoft.VisualStudio.Services.WebApi.Patch",
+                    "Microsoft.VisualStudio.Services.WebApi",
+                    "Microsoft.VisualStudio.Services.Common",
+                    "TFHelper",
+                    "System",
+                    "System.Collections.Generic"
+                    );
+
+
+                string _srcHeader = @"bool ProcessEvent(){
+";
+                string _srcGetClients = @"TFClientHelper TFClient = new TFClientHelper(""" + ServiceUrl + @""", """ + PAT + @""");
+";
+                string _srcEnd = @"
+}
+ProcessEvent()";
+
+                string _src = _srcHeader + _srcGetClients + _rule.ProcessScript + _srcEnd;
+
+                _result = CSharpScript.RunAsync<bool>(_src, _scrOpt).Result.ReturnValue;
+
+                if (Debug) DBConnection.AddRunHistory(_rule, "End run", "");
+            }
+            catch (Exception ex)
+            {
+                if (Debug) DBConnection.AddRunHistory(_rule, "Script exception for : " + _rule.Title, ex.Message + "\n\n" + ex.StackTrace);
+                _result = false;
+            }
+
+            return _result;
+        }
     }
 }

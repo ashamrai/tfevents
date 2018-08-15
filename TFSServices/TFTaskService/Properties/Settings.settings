@@ -1,0 +1,18 @@
+﻿<?xml version='1.0' encoding='utf-8'?>
+<SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="TFTaskService.Properties" GeneratedClassName="Settings">
+  <Profiles />
+  <Settings>
+    <Setting Name="TFSServicesUrl" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">http://localhost:57219</Value>
+    </Setting>
+    <Setting Name="PathGetWatermark" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">api/TS/Tasks/currentrevision</Value>
+    </Setting>
+    <Setting Name="PathGetActiveTasks" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">api/TS/Tasks/scheduledrules</Value>
+    </Setting>
+    <Setting Name="PathRunTask" Type="System.String" Scope="User">
+      <Value Profile="(Default)">api/TS/Tasks/runtask/{0}</Value>
+    </Setting>
+  </Settings>
+</SettingsFile>

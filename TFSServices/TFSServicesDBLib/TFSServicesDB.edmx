@@ -4,23 +4,28 @@
   <edmx:Runtime>
     <!-- SSDL content -->
     <edmx:StorageModels>
-    <Schema Namespace="TFSServicesDB.Store" Alias="Self" Provider="System.Data.SqlClient" ProviderManifestToken="2012" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+    <Schema Namespace="TFSServicesDB.Store" Alias="Self" Provider="System.Data.SqlClient" ProviderManifestToken="2012.Azure" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
   <EntityContainer Name="TFSServicesDBStoreContainer">
     <EntitySet Name="RulesSet" EntityType="TFSServicesDB.Store.RulesSet" store:Type="Tables" Schema="dbo" />
     <EntitySet Name="RuleTypeSet" EntityType="TFSServicesDB.Store.RuleTypeSet" store:Type="Tables" Schema="dbo" />
     <EntitySet Name="RunHistorySet" EntityType="TFSServicesDB.Store.RunHistorySet" store:Type="Tables" Schema="dbo" />
     <EntitySet Name="RevisionsSet" EntityType="TFSServicesDB.Store.RevisionsSet" store:Type="Tables" Schema="dbo" />
+    <EntitySet Name="ScheduleTypeSet" EntityType="TFSServicesDB.Store.ScheduleTypeSet" store:Type="Tables" Schema="dbo" />
     <AssociationSet Name="RuleTypeRules" Association="TFSServicesDB.Store.RuleTypeRules">
       <End Role="RuleType" EntitySet="RuleTypeSet" />
+      <End Role="Rules" EntitySet="RulesSet" />
+    </AssociationSet>
+    <AssociationSet Name="RulesRulesRevisions" Association="TFSServicesDB.Store.RulesRulesRevisions">
+      <End Role="Rules" EntitySet="RulesSet" />
+      <End Role="RulesRevisions" EntitySet="RevisionsSet" />
+    </AssociationSet>
+    <AssociationSet Name="ScheduleTypeRules" Association="TFSServicesDB.Store.ScheduleTypeRules">
+      <End Role="ScheduleType" EntitySet="ScheduleTypeSet" />
       <End Role="Rules" EntitySet="RulesSet" />
     </AssociationSet>
     <AssociationSet Name="RulesRunHistory" Association="TFSServicesDB.Store.RulesRunHistory">
       <End Role="Rules" EntitySet="RulesSet" />
       <End Role="RunHistory" EntitySet="RunHistorySet" />
-    </AssociationSet>
-    <AssociationSet Name="RulesRulesRevisions" Association="TFSServicesDB.Store.RulesRulesRevisions">
-      <End Role="Rules" EntitySet="RulesSet" />
-      <End Role="RulesRevisions" EntitySet="RevisionsSet" />
     </AssociationSet>
   </EntityContainer>
   <EntityType Name="RulesSet">
@@ -36,6 +41,8 @@
     <Property Name="RuleTypeId" Type="int" Nullable="false" />
     <Property Name="Revision" Type="int" Nullable="false" />
     <Property Name="IsDeleted" Type="bit" Nullable="false" DefaultValue="false" />
+    <Property Name="Watermark" Type="int" Nullable="false" />
+    <Property Name="ScheduleTypeId" Type="int" Nullable="false" />
   </EntityType>
   <EntityType Name="RuleTypeSet">
     <Key>
@@ -44,6 +51,8 @@
     <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
     <Property Name="Name" Type="nvarchar(max)" Nullable="false" />
     <Property Name="Description" Type="nvarchar(max)" Nullable="true" />
+    <Property Name="HasSchedule" Type="bit" Nullable="false" DefaultValue="false" />
+    <Property Name="IsEvent" Type="bit" Nullable="false" DefaultValue="false" />
   </EntityType>
   <EntityType Name="RunHistorySet">
     <Key>
@@ -52,9 +61,9 @@
     <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
     <Property Name="Date" Type="datetime" Nullable="false" />
     <Property Name="Result" Type="nvarchar(max)" Nullable="false" />
-    <Property Name="RulesId" Type="int" Nullable="false" />
     <Property Name="RuleRevision" Type="int" Nullable="false" />
     <Property Name="Message" Type="nvarchar(max)" Nullable="false" />
+    <Property Name="RulesId" Type="int" Nullable="true" />
   </EntityType>
   <EntityType Name="RevisionsSet">
     <Key>
@@ -69,6 +78,15 @@
     <Property Name="Revision" Type="int" Nullable="false" />
     <Property Name="Operation" Type="nvarchar" Nullable="false" MaxLength="10" />
   </EntityType>
+  <EntityType Name="ScheduleTypeSet">
+    <Key>
+      <PropertyRef Name="Id" />
+    </Key>
+    <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="Name" Type="nvarchar(max)" Nullable="false" />
+    <Property Name="Period" Type="smallint" Nullable="false" DefaultValue="0" />
+    <Property Name="Step" Type="smallint" Nullable="false" />
+  </EntityType>
   <Association Name="RuleTypeRules">
     <End Role="RuleType" Type="TFSServicesDB.Store.RuleTypeSet" Multiplicity="1" />
     <End Role="Rules" Type="TFSServicesDB.Store.RulesSet" Multiplicity="*" />
@@ -81,18 +99,6 @@
       </Dependent>
     </ReferentialConstraint>
   </Association>
-  <Association Name="RulesRunHistory">
-    <End Role="Rules" Type="TFSServicesDB.Store.RulesSet" Multiplicity="1" />
-    <End Role="RunHistory" Type="TFSServicesDB.Store.RunHistorySet" Multiplicity="*" />
-    <ReferentialConstraint>
-      <Principal Role="Rules">
-        <PropertyRef Name="Id" />
-      </Principal>
-      <Dependent Role="RunHistory">
-        <PropertyRef Name="RulesId" />
-      </Dependent>
-    </ReferentialConstraint>
-  </Association>
   <Association Name="RulesRulesRevisions">
     <End Role="Rules" Type="TFSServicesDB.Store.RulesSet" Multiplicity="1" />
     <End Role="RulesRevisions" Type="TFSServicesDB.Store.RevisionsSet" Multiplicity="*" />
@@ -101,6 +107,30 @@
         <PropertyRef Name="Id" />
       </Principal>
       <Dependent Role="RulesRevisions">
+        <PropertyRef Name="RulesId" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="ScheduleTypeRules">
+    <End Role="ScheduleType" Type="TFSServicesDB.Store.ScheduleTypeSet" Multiplicity="1" />
+    <End Role="Rules" Type="TFSServicesDB.Store.RulesSet" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="ScheduleType">
+        <PropertyRef Name="Id" />
+      </Principal>
+      <Dependent Role="Rules">
+        <PropertyRef Name="ScheduleTypeId" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="RulesRunHistory">
+    <End Role="Rules" Type="TFSServicesDB.Store.RulesSet" Multiplicity="0..1" />
+    <End Role="RunHistory" Type="TFSServicesDB.Store.RunHistorySet" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="Rules">
+        <PropertyRef Name="Id" />
+      </Principal>
+      <Dependent Role="RunHistory">
         <PropertyRef Name="RulesId" />
       </Dependent>
     </ReferentialConstraint>
@@ -117,14 +147,19 @@
             <End Role="Rules" EntitySet="RulesSet" />
           </AssociationSet>
           <EntitySet Name="RunHistorySet" EntityType="TFSServicesDB.RunHistory" />
-          <AssociationSet Name="RulesRunHistory" Association="TFSServicesDB.RulesRunHistory">
-            <End Role="Rules" EntitySet="RulesSet" />
-            <End Role="RunHistory" EntitySet="RunHistorySet" />
-          </AssociationSet>
           <EntitySet Name="RevisionsSet" EntityType="TFSServicesDB.Revisions" />
           <AssociationSet Name="RulesRulesRevisions" Association="TFSServicesDB.RulesRulesRevisions">
             <End Role="Rules" EntitySet="RulesSet" />
             <End Role="RulesRevisions" EntitySet="RevisionsSet" />
+          </AssociationSet>
+          <EntitySet Name="ScheduleTypeSet" EntityType="TFSServicesDB.ScheduleType" />
+          <AssociationSet Name="ScheduleTypeRules" Association="TFSServicesDB.ScheduleTypeRules">
+            <End Role="ScheduleType" EntitySet="ScheduleTypeSet" />
+            <End Role="Rules" EntitySet="RulesSet" />
+          </AssociationSet>
+          <AssociationSet Name="RulesRunHistory" Association="TFSServicesDB.RulesRunHistory">
+            <End Role="Rules" EntitySet="RulesSet" />
+            <End Role="RunHistory" EntitySet="RunHistorySet" />
           </AssociationSet>
         </EntityContainer>
         <EntityType Name="Rules">
@@ -139,10 +174,13 @@
           <Property Name="ProcessScript" Type="String" Nullable="false" />
           <NavigationProperty Name="RuleType" Relationship="TFSServicesDB.RuleTypeRules" FromRole="Rules" ToRole="RuleType" />
           <Property Name="RuleTypeId" Type="Int32" Nullable="false" />
-          <NavigationProperty Name="RunHistory" Relationship="TFSServicesDB.RulesRunHistory" FromRole="Rules" ToRole="RunHistory" />
           <Property Name="Revision" Type="Int32" Nullable="false" />
           <NavigationProperty Name="RulesRevisions" Relationship="TFSServicesDB.RulesRulesRevisions" FromRole="Rules" ToRole="RulesRevisions" />
           <Property Name="IsDeleted" Type="Boolean" Nullable="false" DefaultValue="false" />
+          <Property Name="Watermark" Type="Int32" Nullable="false" />
+          <NavigationProperty Name="ScheduleType" Relationship="TFSServicesDB.ScheduleTypeRules" FromRole="Rules" ToRole="ScheduleType" />
+          <Property Name="ScheduleTypeId" Type="Int32" Nullable="false" />
+          <NavigationProperty Name="RunHistory" Relationship="TFSServicesDB.RulesRunHistory" FromRole="Rules" ToRole="RunHistory" />
         </EntityType>
         <EntityType Name="RuleType">
           <Key>
@@ -152,6 +190,8 @@
           <Property Name="Name" Type="String" Nullable="false" />
           <Property Name="Description" Type="String" Nullable="true" />
           <NavigationProperty Name="Rules" Relationship="TFSServicesDB.RuleTypeRules" FromRole="RuleType" ToRole="Rules" />
+          <Property Name="HasSchedule" Type="Boolean" Nullable="false" DefaultValue="False" />
+          <Property Name="IsEvent" Type="Boolean" Nullable="false" DefaultValue="False" />
         </EntityType>
         <Association Name="RuleTypeRules">
           <End Type="TFSServicesDB.RuleType" Role="RuleType" Multiplicity="1" />
@@ -172,23 +212,11 @@
           <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
           <Property Name="Date" Type="DateTime" Nullable="false" />
           <Property Name="Result" Type="String" Nullable="false" />
-          <NavigationProperty Name="Rules" Relationship="TFSServicesDB.RulesRunHistory" FromRole="RunHistory" ToRole="Rules" />
-          <Property Name="RulesId" Type="Int32" Nullable="false" />
           <Property Name="RuleRevision" Type="Int32" Nullable="false" />
           <Property Name="Message" Type="String" Nullable="false" />
+          <NavigationProperty Name="Rules" Relationship="TFSServicesDB.RulesRunHistory" FromRole="RunHistory" ToRole="Rules" />
+          <Property Name="RulesId" Type="Int32" Nullable="true" />
         </EntityType>
-        <Association Name="RulesRunHistory">
-          <End Type="TFSServicesDB.Rules" Role="Rules" Multiplicity="1" />
-          <End Type="TFSServicesDB.RunHistory" Role="RunHistory" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="Rules">
-              <PropertyRef Name="Id" />
-            </Principal>
-            <Dependent Role="RunHistory">
-              <PropertyRef Name="RulesId" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
         <EntityType Name="Revisions">
           <Key>
             <PropertyRef Name="Id" />
@@ -215,6 +243,40 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
+        <EntityType Name="ScheduleType">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Name" Type="String" Nullable="false" />
+          <Property Name="Period" Type="Int16" Nullable="false" DefaultValue="0" />
+          <Property Name="Step" Type="Int16" Nullable="false" />
+          <NavigationProperty Name="Rules" Relationship="TFSServicesDB.ScheduleTypeRules" FromRole="ScheduleType" ToRole="Rules" />
+        </EntityType>
+        <Association Name="ScheduleTypeRules">
+          <End Type="TFSServicesDB.ScheduleType" Role="ScheduleType" Multiplicity="1" />
+          <End Type="TFSServicesDB.Rules" Role="Rules" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="ScheduleType">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="Rules">
+              <PropertyRef Name="ScheduleTypeId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="RulesRunHistory">
+          <End Type="TFSServicesDB.Rules" Role="Rules" Multiplicity="0..1" />
+          <End Type="TFSServicesDB.RunHistory" Role="RunHistory" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Rules">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="RunHistory">
+              <PropertyRef Name="RulesId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
       </Schema>
     </edmx:ConceptualModels>
     <!-- C-S mapping content -->
@@ -233,6 +295,8 @@
           <ScalarProperty Name="RuleTypeId" ColumnName="RuleTypeId" />
           <ScalarProperty Name="Revision" ColumnName="Revision" />
           <ScalarProperty Name="IsDeleted" ColumnName="IsDeleted" />
+          <ScalarProperty Name="Watermark" ColumnName="Watermark" />
+          <ScalarProperty Name="ScheduleTypeId" ColumnName="ScheduleTypeId" />
         </MappingFragment>
       </EntityTypeMapping>
     </EntitySetMapping>
@@ -242,6 +306,8 @@
           <ScalarProperty Name="Id" ColumnName="Id" />
           <ScalarProperty Name="Name" ColumnName="Name" />
           <ScalarProperty Name="Description" ColumnName="Description" />
+          <ScalarProperty Name="HasSchedule" ColumnName="HasSchedule" />
+          <ScalarProperty Name="IsEvent" ColumnName="IsEvent" />
         </MappingFragment>
       </EntityTypeMapping>
     </EntitySetMapping>
@@ -251,9 +317,9 @@
           <ScalarProperty Name="Id" ColumnName="Id" />
           <ScalarProperty Name="Date" ColumnName="Date" />
           <ScalarProperty Name="Result" ColumnName="Result" />
-          <ScalarProperty Name="RulesId" ColumnName="RulesId" />
           <ScalarProperty Name="RuleRevision" ColumnName="RuleRevision" />
           <ScalarProperty Name="Message" ColumnName="Message" />
+          <ScalarProperty Name="RulesId" ColumnName="RulesId" />
         </MappingFragment>
       </EntityTypeMapping>
     </EntitySetMapping>
@@ -268,6 +334,16 @@
           <ScalarProperty Name="RulesId" ColumnName="RulesId" />
           <ScalarProperty Name="Revision" ColumnName="Revision" />
           <ScalarProperty Name="Operation" ColumnName="Operation" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="ScheduleTypeSet">
+      <EntityTypeMapping TypeName="IsTypeOf(TFSServicesDB.ScheduleType)">
+        <MappingFragment StoreEntitySet="ScheduleTypeSet">
+          <ScalarProperty Name="Id" ColumnName="Id" />
+          <ScalarProperty Name="Name" ColumnName="Name" />
+          <ScalarProperty Name="Period" ColumnName="Period" />
+          <ScalarProperty Name="Step" ColumnName="Step" />
         </MappingFragment>
       </EntityTypeMapping>
     </EntitySetMapping>

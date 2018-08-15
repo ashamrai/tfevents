@@ -2,7 +2,7 @@
 -- --------------------------------------------------
 -- Entity Designer DDL Script for SQL Server 2005, 2008, 2012 and Azure
 -- --------------------------------------------------
--- Date Created: 04/07/2018 17:21:05
+-- Date Created: 08/01/2018 20:09:15
 -- Generated from EDMX file: C:\Users\useradmin\Source\Repos\tfevents\TFSServices\TFSServicesDBLib\TFSServicesDB.edmx
 -- --------------------------------------------------
 
@@ -26,6 +26,9 @@ GO
 IF OBJECT_ID(N'[dbo].[FK_RulesRulesRevisions]', 'F') IS NOT NULL
     ALTER TABLE [dbo].[RevisionsSet] DROP CONSTRAINT [FK_RulesRulesRevisions];
 GO
+IF OBJECT_ID(N'[dbo].[FK_ScheduleTypeRules]', 'F') IS NOT NULL
+    ALTER TABLE [dbo].[RulesSet] DROP CONSTRAINT [FK_ScheduleTypeRules];
+GO
 
 -- --------------------------------------------------
 -- Dropping existing tables
@@ -43,6 +46,9 @@ GO
 IF OBJECT_ID(N'[dbo].[RevisionsSet]', 'U') IS NOT NULL
     DROP TABLE [dbo].[RevisionsSet];
 GO
+IF OBJECT_ID(N'[dbo].[ScheduleTypeSet]', 'U') IS NOT NULL
+    DROP TABLE [dbo].[ScheduleTypeSet];
+GO
 
 -- --------------------------------------------------
 -- Creating all tables
@@ -58,7 +64,9 @@ CREATE TABLE [dbo].[RulesSet] (
     [ProcessScript] nvarchar(max)  NOT NULL,
     [RuleTypeId] int  NOT NULL,
     [Revision] int  NOT NULL,
-    [IsDeleted] bit  NOT NULL
+    [IsDeleted] bit  NOT NULL,
+    [Watermark] int  NOT NULL,
+    [ScheduleTypeId] int  NOT NULL
 );
 GO
 
@@ -66,7 +74,9 @@ GO
 CREATE TABLE [dbo].[RuleTypeSet] (
     [Id] int IDENTITY(1,1) NOT NULL,
     [Name] nvarchar(max)  NOT NULL,
-    [Description] nvarchar(max)  NULL
+    [Description] nvarchar(max)  NULL,
+    [HasSchedule] bit  NOT NULL,
+    [IsEvent] bit  NOT NULL
 );
 GO
 
@@ -75,9 +85,9 @@ CREATE TABLE [dbo].[RunHistorySet] (
     [Id] int IDENTITY(1,1) NOT NULL,
     [Date] datetime  NOT NULL,
     [Result] nvarchar(max)  NOT NULL,
-    [RulesId] int  NOT NULL,
     [RuleRevision] int  NOT NULL,
-    [Message] nvarchar(max)  NOT NULL
+    [Message] nvarchar(max)  NOT NULL,
+    [RulesId] int  NULL
 );
 GO
 
@@ -91,6 +101,15 @@ CREATE TABLE [dbo].[RevisionsSet] (
     [RulesId] int  NOT NULL,
     [Revision] int  NOT NULL,
     [Operation] nvarchar(10)  NOT NULL
+);
+GO
+
+-- Creating table 'ScheduleTypeSet'
+CREATE TABLE [dbo].[ScheduleTypeSet] (
+    [Id] int IDENTITY(1,1) NOT NULL,
+    [Name] nvarchar(max)  NOT NULL,
+    [Period] smallint  NOT NULL,
+    [Step] smallint  NOT NULL
 );
 GO
 
@@ -122,6 +141,12 @@ ADD CONSTRAINT [PK_RevisionsSet]
     PRIMARY KEY CLUSTERED ([Id] ASC);
 GO
 
+-- Creating primary key on [Id] in table 'ScheduleTypeSet'
+ALTER TABLE [dbo].[ScheduleTypeSet]
+ADD CONSTRAINT [PK_ScheduleTypeSet]
+    PRIMARY KEY CLUSTERED ([Id] ASC);
+GO
+
 -- --------------------------------------------------
 -- Creating all FOREIGN KEY constraints
 -- --------------------------------------------------
@@ -141,21 +166,6 @@ ON [dbo].[RulesSet]
     ([RuleTypeId]);
 GO
 
--- Creating foreign key on [RulesId] in table 'RunHistorySet'
-ALTER TABLE [dbo].[RunHistorySet]
-ADD CONSTRAINT [FK_RulesRunHistory]
-    FOREIGN KEY ([RulesId])
-    REFERENCES [dbo].[RulesSet]
-        ([Id])
-    ON DELETE NO ACTION ON UPDATE NO ACTION;
-GO
-
--- Creating non-clustered index for FOREIGN KEY 'FK_RulesRunHistory'
-CREATE INDEX [IX_FK_RulesRunHistory]
-ON [dbo].[RunHistorySet]
-    ([RulesId]);
-GO
-
 -- Creating foreign key on [RulesId] in table 'RevisionsSet'
 ALTER TABLE [dbo].[RevisionsSet]
 ADD CONSTRAINT [FK_RulesRulesRevisions]
@@ -171,12 +181,34 @@ ON [dbo].[RevisionsSet]
     ([RulesId]);
 GO
 
-INSERT INTO [dbo].[RuleTypeSet]
-           ([Name]
-           ,[Description])
-     VALUES
-           ('WorkItemUpdated',
-           'Rules for changing of work item')
+-- Creating foreign key on [ScheduleTypeId] in table 'RulesSet'
+ALTER TABLE [dbo].[RulesSet]
+ADD CONSTRAINT [FK_ScheduleTypeRules]
+    FOREIGN KEY ([ScheduleTypeId])
+    REFERENCES [dbo].[ScheduleTypeSet]
+        ([Id])
+    ON DELETE NO ACTION ON UPDATE NO ACTION;
+GO
+
+-- Creating non-clustered index for FOREIGN KEY 'FK_ScheduleTypeRules'
+CREATE INDEX [IX_FK_ScheduleTypeRules]
+ON [dbo].[RulesSet]
+    ([ScheduleTypeId]);
+GO
+
+-- Creating foreign key on [RulesId] in table 'RunHistorySet'
+ALTER TABLE [dbo].[RunHistorySet]
+ADD CONSTRAINT [FK_RulesRunHistory]
+    FOREIGN KEY ([RulesId])
+    REFERENCES [dbo].[RulesSet]
+        ([Id])
+    ON DELETE NO ACTION ON UPDATE NO ACTION;
+GO
+
+-- Creating non-clustered index for FOREIGN KEY 'FK_RulesRunHistory'
+CREATE INDEX [IX_FK_RulesRunHistory]
+ON [dbo].[RunHistorySet]
+    ([RulesId]);
 GO
 
 -- --------------------------------------------------

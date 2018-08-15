@@ -61,6 +61,9 @@
     <Compile Include="RunHistory.cs">
       <DependentUpon>TFSServicesDB.tt</DependentUpon>
     </Compile>
+    <Compile Include="ScheduleType.cs">
+      <DependentUpon>TFSServicesDB.tt</DependentUpon>
+    </Compile>
     <Compile Include="TFSServicesDB.Context.cs">
       <DependentUpon>TFSServicesDB.Context.tt</DependentUpon>
       <AutoGen>True</AutoGen>
@@ -84,6 +87,7 @@
     </EntityDeploy>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="initdata.sql" />
     <Content Include="TFSServicesDB.Context.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
       <DependentUpon>TFSServicesDB.edmx</DependentUpon>

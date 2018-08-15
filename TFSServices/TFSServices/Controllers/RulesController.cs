@@ -6,6 +6,7 @@ using System.Linq;
 using System.Net;
 using System.Web;
 using System.Web.Mvc;
+using PagedList;
 using TFSServicesDBLib;
 
 namespace TFSServices.Controllers
@@ -15,9 +16,11 @@ namespace TFSServices.Controllers
         private TFSServicesDBContainer db = new TFSServicesDBContainer();
 
         // GET: Rules
-        public ActionResult Index()
+        public ActionResult Index(int? page)
         {
-            return View(db.RulesSet.Where(r => r.IsDeleted == false).ToList());
+            int pageSize = 25;
+            int pageNumber = (page ?? 1);
+            return View(db.RulesSet.Where(r => r.IsDeleted == false).OrderBy(o => o.Id).ToPagedList(pageNumber, pageSize));
         }
 
         // GET: Rules/Details/5
@@ -39,6 +42,7 @@ namespace TFSServices.Controllers
         public ActionResult Create()
         {
             ViewBag.RuleTypeList = new SelectList(db.RuleTypeSet, "Id", "Name");
+            ViewBag.ScheduleTypeList = new SelectList(db.ScheduleTypeSet, "Id", "Name");
 
             return View();
         }
@@ -47,14 +51,18 @@ namespace TFSServices.Controllers
         // Чтобы защититься от атак чрезмерной передачи данных, включите определенные свойства, для которых следует установить привязку. Дополнительные 
         // сведения см. в статье https://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Create([Bind(Include = "Id,IsActive,Title,Description,TriggerScript,ProcessScript,RuleTypeId")] Rules rules)
+        [ValidateInput(false)]
+        public ActionResult Create([Bind(Include = "Id,IsActive,Title,Description,TriggerScript,ProcessScript,RuleTypeId,ScheduleTypeId")] Rules rules)
         {
 
             if (ModelState.IsValid)
             {
+                DBHelper _dBHelper = new DBHelper(db);
+
+                int _curwaterm = _dBHelper.GetCurrentWatermark();
 
                 rules.Revision = 1;
+                rules.Watermark = _curwaterm + 1;
                 db.RulesSet.Add(rules);
                 db.SaveChanges();
                 AddRevision(rules, "Create");
@@ -82,6 +90,7 @@ namespace TFSServices.Controllers
         public ActionResult Edit(int? id)
         {
             ViewBag.RuleTypeList = new SelectList(db.RuleTypeSet, "Id", "Name");
+            ViewBag.ScheduleTypeList = new SelectList(db.ScheduleTypeSet, "Id", "Name");
 
             if (id == null)
             {
@@ -99,11 +108,15 @@ namespace TFSServices.Controllers
         // Чтобы защититься от атак чрезмерной передачи данных, включите определенные свойства, для которых следует установить привязку. Дополнительные 
         // сведения см. в статье https://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Edit([Bind(Include = "Id,Revision,IsActive,Title,Description,TriggerScript,ProcessScript,RuleTypeId")] Rules rules)
+        [ValidateInput(false)]
+        public ActionResult Edit([Bind(Include = "Id,Revision,IsActive,Title,Description,TriggerScript,ProcessScript,RuleTypeId,ScheduleTypeId")] Rules rules)
         {
             if (ModelState.IsValid)
             {
+                DBHelper _dBHelper = new DBHelper(db);
+                int _curwaterm = _dBHelper.GetCurrentWatermark();
+
+                rules.Watermark = _curwaterm + 1;
                 rules.Revision = rules.Revision + 1;
                 db.Entry(rules).State = EntityState.Modified;
                 db.SaveChanges();
@@ -133,10 +146,14 @@ namespace TFSServices.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult DeleteConfirmed(int id)
         {
+            DBHelper _dBHelper = new DBHelper(db);
+            int _curwaterm = _dBHelper.GetCurrentWatermark();
+            
             Rules rules = db.RulesSet.Find(id);
             rules.IsDeleted = true;
             rules.IsActive = false;
-            db.RulesSet.Remove(rules);
+            rules.Watermark = _curwaterm + 1;
+            //db.RulesSet.Remove(rules);
             db.Entry(rules).State = EntityState.Modified;
             db.SaveChanges();
             Revisions _rev = new Revisions();
@@ -151,6 +168,34 @@ namespace TFSServices.Controllers
                 db.Dispose();
             }
             base.Dispose(disposing);
+        }
+
+        // GET: Rules/Delete/5
+        public ActionResult Run(int? id)
+        {
+            if (id == null)
+            {
+                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
+            }
+            Rules rules = db.RulesSet.Find(id);
+            if (rules == null)
+            {
+                return HttpNotFound();
+            }
+            return View(rules);
+        }
+
+        // POST: Rules/Run/5
+        [HttpPost, ActionName("Run")]
+        [ValidateAntiForgeryToken]
+        public ActionResult RunConfirmed(int id)
+        {
+            var _srcs = new ScriptsEngineLib.ScriptsEngine(Properties.Settings.Default.ServiceUrl, Properties.Settings.Default.PAT);
+            _srcs.Debug = Properties.Settings.Default.Debug;
+
+            _srcs.RunTaskScript(id);
+
+            return RedirectToAction("Index", "RunHistories");
         }
     }
 }

@@ -5,7 +5,7 @@ using System.Runtime.Serialization;
 using System.Threading.Tasks;
 
 
-namespace TFTypesLib
+namespace TFHelper
 {
     [DataContract]
     public class WorkItemEvent

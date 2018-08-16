@@ -16,6 +16,13 @@ namespace ScriptsEngineLib
 {
     public class ScriptsEngine
     {
+        public class Globals
+        {
+            public bool ScriptResult;
+            public string ScriptMessage;
+        }
+
+
         TFSServicesDBLib.DBHelper DBConnection = new TFSServicesDBLib.DBHelper();
         public bool Debug = false;
         string ServiceUrl = "";
@@ -125,7 +132,7 @@ CheckConditionUpdated(InputWorkItem)";
                     );
 
 
-                string _srcHeader = @"bool ProcessEvent(WorkItemEvent.WorkItemEventUpdated InputWorkItem){";
+                string _srcHeader = @"string ProcessEvent(WorkItemEvent.WorkItemEventUpdated InputWorkItem){";
                 string _srcEnd = @"
 }
 ProcessEvent(InputWorkItem)";
@@ -149,6 +156,8 @@ ProcessEvent(InputWorkItem)";
         public bool RunTaskScript(int pTaskId)
         {
             bool _result = false;
+            string _scriptMessage = "";
+            string _scriptDetailedMessage = "";
 
             TFSServicesDBLib.Rules _rule = DBConnection.GetRuleById(pTaskId);
 
@@ -161,6 +170,8 @@ ProcessEvent(InputWorkItem)";
             try
             {
                 if (Debug) DBConnection.AddRunHistory(_rule, "Start run", "");
+
+                var _globals = new Globals { ScriptResult = true, ScriptMessage = "" };
 
                 var _scrOpt = ScriptOptions.Default.AddReferences(
                     Assembly.GetAssembly(typeof(WorkItemTrackingHttpClient)),
@@ -183,7 +194,11 @@ ProcessEvent(InputWorkItem)";
                     );
 
 
-                string _srcHeader = @"bool ProcessEvent(){
+                string _srcHeader = @"bool ScriptResult = true;
+string ScriptMessage = """";
+string ScriptDetailedMessage = """";
+
+void ProcessEvent(){
 ";
                 string _srcGetClients = @"TFClientHelper TFClient = new TFClientHelper(""" + ServiceUrl + @""", """ + PAT + @""");
 ";
@@ -193,13 +208,23 @@ ProcessEvent()";
 
                 string _src = _srcHeader + _srcGetClients + _rule.ProcessScript + _srcEnd;
 
-                _result = CSharpScript.RunAsync<bool>(_src, _scrOpt).Result.ReturnValue;
+                var _scriptResult = CSharpScript.RunAsync<bool>(_src, _scrOpt).Result;
 
-                if (Debug) DBConnection.AddRunHistory(_rule, "End run", "");
+                if ( _scriptResult.Variables.Length == 3)
+                {
+                    _result = (bool)_scriptResult.Variables[0].Value;
+                    _scriptMessage = (string)_scriptResult.Variables[1].Value;
+                    _scriptDetailedMessage = (string)_scriptResult.Variables[2].Value;
+
+                    if (Debug) DBConnection.AddRunHistory(_rule, "End run: " + _scriptMessage, _scriptDetailedMessage);
+                }
+                else
+                    DBConnection.AddRunHistory(_rule, "Script did not return all globals", "");
+
             }
             catch (Exception ex)
             {
-                if (Debug) DBConnection.AddRunHistory(_rule, "Script exception for : " + _rule.Title, ex.Message + "\n\n" + ex.StackTrace);
+                if (Debug) DBConnection.AddRunHistory(_rule, "Script exception", ex.Message + "\n\n" + ex.StackTrace);
                 _result = false;
             }
 

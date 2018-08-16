@@ -48,10 +48,14 @@ namespace TFHelper
 
         public List<int> GetTopLevelWorkItemIds(WorkItemQueryResult pResult)
         {
-            List<int> _res = pResult.WorkItemRelations.Where(p => p.Source == null).Select(i => i.Target.Id).ToList();
-
-            return _res;
+            return pResult.WorkItemRelations.Where(p => p.Source == null).Select(i => i.Target.Id).ToList();
         }
 
+        public List<int> GetLinkedlWorkItemIds(WorkItemQueryResult pResult, int pId, string pReferenceName = "")
+        {
+            return (pReferenceName == "") ?
+                pResult.WorkItemRelations.Where(p => p.Source.Id == pId).Select(i => i.Target.Id).ToList() :
+                pResult.WorkItemRelations.Where(p => p.Source.Id == pId && p.Rel == pReferenceName).Select(i => i.Target.Id).ToList();
+        }
     }
 }

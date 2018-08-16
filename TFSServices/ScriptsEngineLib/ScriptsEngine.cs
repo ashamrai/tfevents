@@ -175,6 +175,8 @@ ProcessEvent(InputWorkItem)";
 
                 var _scrOpt = ScriptOptions.Default.AddReferences(
                     Assembly.GetAssembly(typeof(WorkItemTrackingHttpClient)),
+                    Assembly.GetAssembly(typeof(Exception)),
+                    Assembly.GetAssembly(typeof(WorkItem)),
                     Assembly.GetAssembly(typeof(JsonPatchDocument)),
                     Assembly.GetAssembly(typeof(VssConnection)),
                     Assembly.GetAssembly(typeof(VssBasicCredential)),
@@ -190,6 +192,7 @@ ProcessEvent(InputWorkItem)";
                     "Microsoft.VisualStudio.Services.Common",
                     "TFHelper",
                     "System",
+                    "System.Exception",
                     "System.Collections.Generic"
                     );
 
@@ -199,10 +202,18 @@ string ScriptMessage = """";
 string ScriptDetailedMessage = """";
 
 void ProcessEvent(){
+try
+{
 ";
                 string _srcGetClients = @"TFClientHelper TFClient = new TFClientHelper(""" + ServiceUrl + @""", """ + PAT + @""");
 ";
                 string _srcEnd = @"
+}
+catch(Exception ex)
+{
+    ScriptMessage = ""Exception"";
+    ScriptDetailedMessage = ex.Message + ""\n"" + ex.StackTrace;
+}
 }
 ProcessEvent()";
 

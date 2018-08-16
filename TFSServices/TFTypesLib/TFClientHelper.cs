@@ -29,6 +29,35 @@ namespace TFHelper
             WitClient = connection.GetClient<WorkItemTrackingHttpClient>();
         }
 
+        public WorkItem GetWorkItem(int pId)
+        {
+            return WitClient.GetWorkItemAsync(pId, expand: WorkItemExpand.Relations).Result;
+        }
+        public int GetWIIDFromUrl(string pUrl)
+        {
+            int _id = 0;
+
+            string[] _url_arr = pUrl.Split(new string[] { "_apis/wit/workItems/" }, StringSplitOptions.RemoveEmptyEntries);
+
+            if (_url_arr.Count() == 2)
+            {
+                if (int.TryParse(_url_arr[1], out _id)) return _id;
+                else return 0;
+            }
+
+            return 0;
+        }
+
+        public WorkItem GetWorkItem(string pUrl)
+        {
+            int _id = GetWIIDFromUrl(pUrl);
+
+            if (_id > 0)
+                return WitClient.GetWorkItemAsync(_id, expand: WorkItemExpand.Relations).Result;
+            else
+                return null;
+        }
+
         public WorkItem UpdateWorkItem(int pId, Dictionary<string, string> pFields)
         {
             JsonPatchDocument _patchDocument = new JsonPatchDocument();
@@ -56,6 +85,11 @@ namespace TFHelper
             return (pReferenceName == "") ?
                 pResult.WorkItemRelations.Where(p => p.Source.Id == pId).Select(i => i.Target.Id).ToList() :
                 pResult.WorkItemRelations.Where(p => p.Source.Id == pId && p.Rel == pReferenceName).Select(i => i.Target.Id).ToList();
+        }
+
+        public List<int> GetLinkedlWorkItemIds(WorkItem pWorkItem, string pReferenceName)
+        {
+            return pWorkItem.Relations.Where(p => p.Rel == pReferenceName).Select(i => GetWIIDFromUrl(i.Url)).ToList();
         }
     }
 }

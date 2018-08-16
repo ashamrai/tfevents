@@ -14,7 +14,7 @@ namespace ConsoleTestScript
         static void Main(string[] args)
         {
             TFClientHelper TFClient = new TFClientHelper(@"", @"");
-            TestScript.UpdateParentProposed(TFClient);
+            TestScript.UpdateTaskCompletedFromActivity(TFClient);
         }        
     }
 }

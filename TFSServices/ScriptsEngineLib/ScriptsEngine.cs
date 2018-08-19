@@ -4,6 +4,7 @@ using System.IO;
 using System.Reflection;
 using Microsoft.CodeAnalysis.CSharp.Scripting;
 using Microsoft.CodeAnalysis.Scripting;
+using Microsoft.TeamFoundation.Work.WebApi;
 using Microsoft.TeamFoundation.WorkItemTracking.WebApi;
 using Microsoft.TeamFoundation.WorkItemTracking.WebApi.Models;
 using Microsoft.VisualStudio.Services.Common;
@@ -174,6 +175,7 @@ ProcessEvent(InputWorkItem)";
                 var _globals = new Globals { ScriptResult = true, ScriptMessage = "" };
 
                 var _scrOpt = ScriptOptions.Default.AddReferences(
+                    Assembly.GetAssembly(typeof(TeamSettingsIteration)),
                     Assembly.GetAssembly(typeof(WorkItemTrackingHttpClient)),
                     Assembly.GetAssembly(typeof(Exception)),
                     Assembly.GetAssembly(typeof(WorkItem)),
@@ -184,6 +186,7 @@ ProcessEvent(InputWorkItem)";
                     Assembly.GetAssembly(typeof(TFClientHelper)),
                      Assembly.GetAssembly(typeof(Dictionary<string, string>))
                     ).AddImports(
+                    "Microsoft.TeamFoundation.Work.WebApi",
                     "Microsoft.TeamFoundation.WorkItemTracking.WebApi",
                     "Microsoft.TeamFoundation.WorkItemTracking.WebApi.Models",
                     "Microsoft.VisualStudio.Services.WebApi.Patch.Json",

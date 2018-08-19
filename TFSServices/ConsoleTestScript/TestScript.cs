@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.TeamFoundation.Work.WebApi;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -66,17 +67,20 @@ namespace ConsoleTestScript
             else
                 ScriptMessage = "Without changes";
         }
+        
 
         public static void UpdateTaskCompletedFromActivity(TFClientHelper TFClient)
         {
             try
             {
+               
                 string TFProject = "ITService";
                 DateTime ChahgedDate = DateTime.UtcNow.AddDays(-7);
                 string Wiql = @"SELECT [System.Id] FROM WorkItemLinks WHERE ([Source].[System.TeamProject] = '" + TFProject +
                     @"' AND  [Source].[System.WorkItemType] = 'Task') And ([System.Links.LinkType] = 'System.LinkTypes.Hierarchy-Forward') And ([Target].[System.WorkItemType] = 'Activity'  AND  [Target].[System.ChangedDate] >'" + ChahgedDate.ToShortDateString() +
                     @"') ORDER BY [System.Id] mode(MustContain)";
 
+                
                 var WiqlResult = TFClient.GetWorkItemListWithWIQL(Wiql, TFProject);
                 var TopLevelIds = TFClient.GetTopLevelWorkItemIds(WiqlResult);
 
@@ -98,7 +102,7 @@ namespace ConsoleTestScript
                         {
                             var ChildWorkItem = TFClient.GetWorkItem(ChildId);
 
-                            if ("Activity" == (string)ChildWorkItem.Fields["System.WorkItemType"])
+                            if ((string)ChildWorkItem.Fields["System.WorkItemType"] == "Activity")
                                 if (ChildWorkItem.Fields.Keys.Contains("Microsoft.VSTS.Scheduling.CompletedWork"))
                                 {
                                     NewHours += (double)ChildWorkItem.Fields["Microsoft.VSTS.Scheduling.CompletedWork"];
@@ -124,7 +128,7 @@ namespace ConsoleTestScript
                 else
                     ScriptMessage = "Without changes";
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 ScriptMessage = "Exception";
                 ScriptDetailedMessage = ex.Message + "\n" + ex.StackTrace;

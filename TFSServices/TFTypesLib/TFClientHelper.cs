@@ -10,15 +10,47 @@ using Microsoft.VisualStudio.Services.WebApi.Patch.Json;
 using Microsoft.TeamFoundation.WorkItemTracking.WebApi;
 using Microsoft.TeamFoundation.WorkItemTracking.WebApi.Models;
 using Microsoft.VisualStudio.Services.Common;
+using Microsoft.TeamFoundation.Work.WebApi;
+using Microsoft.TeamFoundation.Core.WebApi;
+using Microsoft.TeamFoundation.Core.WebApi.Types;
 
 namespace TFHelper
 {
+    public static class TFFields
+    {
+        public static TFField TargetDate = new TFField { Name = "Target Date", RefName = "Microsoft.VSTS.Scheduling.TargetDate" };
+        public static TFField CompletedWork = new TFField { Name = "Completed Work", RefName = "Microsoft.VSTS.Scheduling.CompletedWork" };
+        public static TFField RemainingWork = new TFField { Name = "Remaining Work", RefName = "Microsoft.VSTS.Scheduling.RemainingWork" };
+        public static TFField Priority = new TFField { Name = "Priority", RefName = "Microsoft.VSTS.Common.Priority" };
+        public static TFField Blocked = new TFField { Name = "Blocked", RefName = "Microsoft.VSTS.CMMI.Blocked" };
+        public static TFField WorkItemType = new TFField { Name = "Work Item Type", RefName = "System.WorkItemType" };
+        public static TFField Triage = new TFField { Name = "Triage", RefName = "Triage" };
+        public static TFField State = new TFField { Name = "State", RefName = "System.State" };
+        public static TFField Title = new TFField { Name = "Title", RefName = "System.Title" };
+        public static TFField AssignedTo = new TFField { Name = "Assigned To", RefName = "System.AssignedTo" };
+        public static TFField IterationPath = new TFField { Name = "Iteration Path", RefName = "System.IterationPath" };
+        public static TFField AreaPath = new TFField { Name = "Area Path", RefName = "System.AreaPath" };
+        public static TFField LinkParent = new TFField { Name = "Parent", RefName = "System.LinkTypes.Hierarchy-Reverse" };
+        public static TFField LinkChild = new TFField { Name = "Child", RefName = "System.LinkTypes.Hierarchy-Forward" };
+        public static TFField LinkSuccessor = new TFField { Name = "Successor", RefName = "System.LinkTypes.Dependency-Forward" };
+        public static TFField LinkPredecessor = new TFField { Name = "Predecessor", RefName = "System.LinkTypes.Dependency-Forward" };
+
+        public class TFField
+        {
+            public string Name = "";
+            public string RefName = "";
+        }
+    }
+
     public class TFClientHelper
     {
         private string ServiceUrl{ get; set; }
         private string PAT { get; set; }
 
         public WorkItemTrackingHttpClient WitClient { get; set; }
+        public WorkHttpClient WorkClient { get; set; }
+        public TeamHttpClient TeamClient { get; set; }
+        public ProjectHttpClient ProjectClient { get; set; }
 
         public TFClientHelper(string pServiceUrl, string pPAT)
         {
@@ -27,6 +59,9 @@ namespace TFHelper
 
             VssConnection connection = new VssConnection(new Uri(ServiceUrl), new VssBasicCredential(string.Empty, PAT));
             WitClient = connection.GetClient<WorkItemTrackingHttpClient>();
+            WorkClient = connection.GetClient<WorkHttpClient>();
+            TeamClient = connection.GetClient<TeamHttpClient>();
+            ProjectClient = connection.GetClient<ProjectHttpClient>();
         }
 
         public WorkItem GetWorkItem(int pId)
@@ -56,6 +91,29 @@ namespace TFHelper
                 return WitClient.GetWorkItemAsync(_id, expand: WorkItemExpand.Relations).Result;
             else
                 return null;
+        }
+
+        public WorkItem CreateWorkItem(string pProjectName, string pWorkItemType, Dictionary<String, String> pFields, string pParentUrl)
+        {
+            JsonPatchDocument _patchDocument = new JsonPatchDocument();
+
+            foreach (var _key in pFields.Keys) _patchDocument.Add(new JsonPatchOperation() { Operation = Operation.Add, Path = "/fields/" + _key, Value = pFields[_key] });
+
+            _patchDocument.Add(
+                new JsonPatchOperation()
+                {
+                    Operation = Operation.Add,
+                    Path = "/relations/-",
+                    Value = new
+                    {
+                        rel = TFFields.LinkParent.RefName,
+                        url = pParentUrl,
+                        attributes = new { comment = "From service" }
+                    }
+                }
+            );
+
+            return WitClient.CreateWorkItemAsync(_patchDocument, pProjectName, pWorkItemType).Result;
         }
 
         public WorkItem UpdateWorkItem(int pId, Dictionary<string, string> pFields)
@@ -90,6 +148,22 @@ namespace TFHelper
         public List<int> GetLinkedlWorkItemIds(WorkItem pWorkItem, string pReferenceName)
         {
             return pWorkItem.Relations.Where(p => p.Rel == pReferenceName).Select(i => GetWIIDFromUrl(i.Url)).ToList();
+        }
+
+
+        public TeamSettingsIteration GetDefaultTeamCurrentIteration(string pProjectName)
+        {
+            var project = ProjectClient.GetProject(pProjectName).Result;
+
+            TeamContext _tmcntx = new TeamContext(project.Id, project.DefaultTeam.Id);
+
+            var _iterations = WorkClient.GetTeamIterationsAsync(_tmcntx).Result;
+           
+            foreach (var _iteration in _iterations)
+                if (DateTime.Now.Date >= _iteration.Attributes.StartDate && DateTime.Now.Date <= _iteration.Attributes.FinishDate)
+                    return _iteration;
+
+            return null;
         }
     }
 }

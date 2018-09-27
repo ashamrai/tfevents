@@ -50,15 +50,30 @@ namespace TFTaskService.Properties {
             }
         }
         
-        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("api/TS/Tasks/runtask/{0}")]
         public string PathRunTask {
             get {
                 return ((string)(this["PathRunTask"]));
             }
-            set {
-                this["PathRunTask"] = value;
+        }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("30")]
+        public int HistoryDaysLeft {
+            get {
+                return ((int)(this["HistoryDaysLeft"]));
+            }
+        }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("api/DB/history/clear/{0}")]
+        public string PathHistoryClear {
+            get {
+                return ((string)(this["PathHistoryClear"]));
             }
         }
     }

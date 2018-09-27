@@ -1,4 +1,5 @@
 ﻿using Microsoft.TeamFoundation.Work.WebApi;
+using Microsoft.TeamFoundation.WorkItemTracking.WebApi.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -66,6 +67,58 @@ namespace ConsoleTestScript
             }
             else
                 ScriptMessage = "Without changes";
+        }
+
+        public static void Custom(TFClientHelper TFClient)
+        {
+            try
+            {
+                string TFProject = "ITService";
+                string[] ItemTypes = new string[] { "Requirement", "Task", "Stage" };
+                string WiqlTypes = "";
+                foreach (string ItemType in ItemTypes)  WiqlTypes += ((WiqlTypes == "") ? "" : ", ") + "'" + ItemType + "'";
+
+                TeamSettingsIteration CurrentIteration = TFClient.GetDefaultTeamCurrentIteration(TFProject);
+
+                if (CurrentIteration == null)
+                {
+                    ScriptMessage = "Can not get the current iteration";
+                    return;
+                }
+
+                
+                string Wiql = @"SELECT [System.Id] FROM WorkItems WHERE [System.TeamProject] ='" + TFProject +
+                    @"'  AND  [System.WorkItemType] IN (" + WiqlTypes +
+                    ")  AND  [System.IterationPath] <> '" + CurrentIteration.Path +
+                    "' AND  [System.State] <> 'Closed'  AND  [Microsoft.VSTS.Scheduling.StartDate] <= '" + CurrentIteration.Attributes.FinishDate.Value.ToShortDateString() +
+                    @"' ORDER BY [System.Id]";
+
+
+                var WiqlResult = TFClient.GetWorkItemListWithWIQL(Wiql, TFProject);
+
+                foreach(WorkItemReference WorkItemRef in WiqlResult.WorkItems)
+                {                    
+                    Dictionary<string, string> Fields = new Dictionary<string, string>();
+                    Fields.Add(TFFields.IterationPath.RefName, CurrentIteration.Path);
+
+                    //WorkItem WI = TFClient.UpdateWorkItem(WorkItemRef.Id, Fields);
+                    ScriptDetailedMessage += WorkItemRef.Id + ";";
+                }
+
+                if (ScriptDetailedMessage != "")
+                {
+                    ScriptDetailedMessage = "Updated work items: " + ScriptDetailedMessage;
+                    ScriptMessage = "Work items was updated";
+                }
+                else
+                    ScriptMessage = "Without changes";
+
+            }
+            catch (Exception ex)
+            {
+                ScriptMessage = "Exception";
+                ScriptDetailedMessage = ex.Message + "\n" + ex.StackTrace;
+            }
         }
         
 

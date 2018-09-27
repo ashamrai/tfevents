@@ -84,4 +84,18 @@ namespace TFSServices.Controllers
             _srcs.ProcessWokItemUpdatedEvent(value);
         }
     }
+
+    [Route("api/DB/history/clear/{pDays}")]
+    public class DBTaskHistoryController : ApiController
+    {
+        // GET: api/DB/history/clear/{pDays}
+        [HttpGet]
+        public bool Get([FromUri] int pDays)
+        {
+            TFSServicesDBLib.DBHelper _dBHelper = new TFSServicesDBLib.DBHelper();
+            if (_dBHelper.CleanHistory(pDays) != "") return false;
+
+            return true;
+        }
+    }
 }

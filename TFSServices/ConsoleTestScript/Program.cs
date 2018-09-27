@@ -13,8 +13,8 @@ namespace ConsoleTestScript
     {
         static void Main(string[] args)
         {
-            TFClientHelper TFClient = new TFClientHelper(@"", @"");
-            TestScript.UpdateTaskCompletedFromActivity(TFClient);
+            TFClientHelper TFClient = new TFClientHelper(@"https://metpilot.visualstudio.com", @"whsnld4rrtkecjwf56tawt6gt5maj65xeagsblvqbbq3a66uudpq");
+            TestScript.Custom(TFClient);
         }        
     }
 }

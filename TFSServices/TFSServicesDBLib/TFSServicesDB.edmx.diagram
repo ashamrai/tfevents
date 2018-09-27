@@ -9,7 +9,7 @@
         <EntityTypeShape EntityType="TFSServicesDB.RuleType" Width="1.5" PointX="14.75" PointY="1.875" />
         <AssociationConnector Association="TFSServicesDB.RuleTypeRules" />
         <EntityTypeShape EntityType="TFSServicesDB.RunHistory" Width="1.5" PointX="12.5" PointY="2.625" IsExpanded="true" />
-        <EntityTypeShape EntityType="TFSServicesDB.Revisions" Width="1.5" PointX="7" PointY="1.5" IsExpanded="false" />
+        <EntityTypeShape EntityType="TFSServicesDB.Revisions" Width="1.5" PointX="7" PointY="1.5" IsExpanded="true" />
         <AssociationConnector Association="TFSServicesDB.RulesRulesRevisions" />
         <EntityTypeShape EntityType="TFSServicesDB.ScheduleType" Width="1.5" PointX="7.375" PointY="4.875" />
         <AssociationConnector Association="TFSServicesDB.ScheduleTypeRules" />

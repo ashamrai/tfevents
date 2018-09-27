@@ -79,6 +79,25 @@ namespace TFSServicesDBLib
             return _retMessage;
         }
 
+        public string CleanHistory(int pDays)
+        {
+            string _retMessage = "";
+
+            try
+            {
+                DateTime _daysLeft = DateTime.Now.AddDays((-1) * pDays);
+                var _historyToRemove = DB.RunHistorySet.Where(h => h.Date < _daysLeft);
+                DB.RunHistorySet.RemoveRange(_historyToRemove);
+                DB.SaveChanges();
+            }
+            catch (Exception ex)
+            {
+                _retMessage += ex.Message + "\n\n" + ex.StackTrace;
+            }
+
+            return _retMessage;
+        }
+
         ~DBHelper()
         {
             DB.Dispose();

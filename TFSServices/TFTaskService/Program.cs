@@ -28,8 +28,34 @@ namespace TFTaskService
         static void Main(string[] args)
         {
             Timer _tmupdate = new Timer(UpdateRules, null, 0, 60000);
+            Timer _tmhistory = new Timer(ClearHistory, null, 0, 86400000);
 
-            while (true) { };
+            while (true) { Thread.Sleep(60000); };
+        }
+
+        static void ClearHistory(object pParam)
+        {
+            HttpClient _client = new HttpClient();
+
+            try
+            {
+                _client.BaseAddress = new Uri(Properties.Settings.Default.TFSServicesUrl);
+                _client.DefaultRequestHeaders.Accept.Clear();
+                _client.DefaultRequestHeaders.Accept.Add(
+                    new MediaTypeWithQualityHeaderValue("application/json"));
+
+                bool _result = StartRemoteTask(_client, String.Format(Properties.Settings.Default.PathHistoryClear, Properties.Settings.Default.HistoryDaysLeft)).Result;
+
+            }
+            catch (Exception _ex)
+            {
+
+            }
+            finally
+            {
+                UpdatingRules = false;
+                _client.Dispose();
+            }
         }
 
         static void UpdateRules(object pParam)
@@ -90,10 +116,10 @@ namespace TFTaskService
             }
         }
 
-        private static void AddTaskTimer(TFSServicesTypes.Rule _rule, string pOperation)
+        private static void AddTaskTimer(TFSServicesTypes.Rule pRule, string pOperation)
         {
-            TaskTimers.Add(new TaskTimer { Rule = _rule, Timer = new Timer(StartTask, _rule.id, GetShiftRun(_rule), GetStepRun(_rule)) });
-            Console.WriteLine(String.Format("Rule {0}: id {1}; rev {2}", pOperation, _rule.id, _rule.rev));
+            TaskTimers.Add(new TaskTimer { Rule = pRule, Timer = new Timer(StartTask, pRule.id, GetShiftRun(pRule), GetStepRun(pRule)) });
+            Console.WriteLine(String.Format("Rule {0}: id {1}; rev {2}", pOperation, pRule.id, pRule.rev));
         }
 
         static int GetShiftRun(TFSServicesTypes.Rule pRule)
@@ -108,7 +134,7 @@ namespace TFTaskService
                     _ret_val = ((60 - _cur_mins) % pRule.step) * 60000; // minutes
                     break;
                 case 1:
-                    _ret_val = (((24 - _cur_hours) % pRule.step) * 60 - _cur_mins) * 60000; //hours
+                    _ret_val = (((24 - _cur_hours) % pRule.step) * 60 + 60 - _cur_mins) * 60000; //hours
                     break;
             }
 

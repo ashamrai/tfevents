@@ -66,7 +66,7 @@ namespace TFHelper
 
         public WorkItem GetWorkItem(int pId)
         {
-            return WitClient.GetWorkItemAsync(pId, expand: WorkItemExpand.Relations).Result;
+            return WitClient.GetWorkItemAsync(pId, expand: WorkItemExpand.All).Result;
         }
         public int GetWIIDFromUrl(string pUrl)
         {

@@ -2,13 +2,13 @@
 -- --------------------------------------------------
 -- Entity Designer DDL Script for SQL Server 2005, 2008, 2012 and Azure
 -- --------------------------------------------------
--- Date Created: 08/01/2018 20:09:15
+-- Date Created: 09/27/2018 17:00:16
 -- Generated from EDMX file: C:\Users\useradmin\Source\Repos\tfevents\TFSServices\TFSServicesDBLib\TFSServicesDB.edmx
 -- --------------------------------------------------
 
 SET QUOTED_IDENTIFIER OFF;
 GO
-USE [TFSServicesDB];
+USE [tfeventsdb];
 GO
 IF SCHEMA_ID(N'dbo') IS NULL EXECUTE(N'CREATE SCHEMA [dbo]');
 GO
@@ -20,14 +20,14 @@ GO
 IF OBJECT_ID(N'[dbo].[FK_RuleTypeRules]', 'F') IS NOT NULL
     ALTER TABLE [dbo].[RulesSet] DROP CONSTRAINT [FK_RuleTypeRules];
 GO
-IF OBJECT_ID(N'[dbo].[FK_RulesRunHistory]', 'F') IS NOT NULL
-    ALTER TABLE [dbo].[RunHistorySet] DROP CONSTRAINT [FK_RulesRunHistory];
-GO
 IF OBJECT_ID(N'[dbo].[FK_RulesRulesRevisions]', 'F') IS NOT NULL
     ALTER TABLE [dbo].[RevisionsSet] DROP CONSTRAINT [FK_RulesRulesRevisions];
 GO
 IF OBJECT_ID(N'[dbo].[FK_ScheduleTypeRules]', 'F') IS NOT NULL
     ALTER TABLE [dbo].[RulesSet] DROP CONSTRAINT [FK_ScheduleTypeRules];
+GO
+IF OBJECT_ID(N'[dbo].[FK_RulesRunHistory]', 'F') IS NOT NULL
+    ALTER TABLE [dbo].[RunHistorySet] DROP CONSTRAINT [FK_RulesRunHistory];
 GO
 
 -- --------------------------------------------------

@@ -165,5 +165,54 @@ namespace TFHelper
 
             return null;
         }
+
+        public WorkItemClassificationNode CreateIteration(string TeamProjectName, string IterationName, DateTime StartDate, DateTime FinishDate, string ParentIteration = "")
+        {
+            var project = ProjectClient.GetProject(TeamProjectName).Result;
+
+            WorkItemClassificationNode newIteration = new WorkItemClassificationNode();
+            newIteration.Name = IterationName;
+            newIteration.StructureType = TreeNodeStructureType.Iteration;
+
+            if (StartDate != DateTime.MinValue && FinishDate != DateTime.MinValue)
+            {
+                newIteration.Attributes = new Dictionary<string, object>();
+                newIteration.Attributes.Add("startDate", StartDate);
+                newIteration.Attributes.Add("finishDate", FinishDate);
+            }
+
+            var result =  WitClient.CreateOrUpdateClassificationNodeAsync(newIteration, project.Id, TreeStructureGroup.Iterations).Result;
+
+            if (ParentIteration != "") result = MoveIteration(TeamProjectName, result, ParentIteration);
+
+            return result;
+        }
+
+        public WorkItemClassificationNode MoveIteration(string TeamProjectName, string IterationName, string ParentIteration)
+        {
+            WorkItemClassificationNode iteration = WitClient.GetClassificationNodeAsync(
+                TeamProjectName,
+                TreeStructureGroup.Iterations,
+                IterationName, 4).Result;
+
+            return MoveIteration(TeamProjectName, iteration, ParentIteration);
+        }
+
+        public WorkItemClassificationNode MoveIteration(string TeamProjectName, WorkItemClassificationNode Iteration, string ParentIteration)
+        {
+            return WitClient.CreateOrUpdateClassificationNodeAsync(Iteration, TeamProjectName, TreeStructureGroup.Iterations, ParentIteration).Result;
+        }
+
+        public TeamSettingsIteration AddIterationToTeam(string TeamProjectName, string TeamName, WorkItemClassificationNode Iteration)
+        {
+            TeamContext tmcntx = new TeamContext(TeamProjectName, TeamName);
+
+            TeamSettingsIteration teamSettingsIteration = new TeamSettingsIteration();
+            teamSettingsIteration.Id = Iteration.Identifier;
+            teamSettingsIteration.Name = Iteration.Name;
+            teamSettingsIteration.Links = Iteration.Links;
+
+            return WorkClient.PostTeamIterationAsync(teamSettingsIteration, tmcntx).Result;
+        }
     }
 }

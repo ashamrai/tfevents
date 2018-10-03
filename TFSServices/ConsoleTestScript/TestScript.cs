@@ -15,6 +15,56 @@ namespace ConsoleTestScript
         static string ScriptMessage = "";
         static string ScriptDetailedMessage = "";
 
+        public static void CreateSprintsForEachWeek(TFClientHelper TFClient)
+        {
+            try
+            {
+                Dictionary<string, List<string>> TeamProjects = new Dictionary<string, List<string>>();
+                DateTime FromDate = new DateTime(2018, 10, 3);
+                DateTime ToDate = new DateTime(2018, 10, 31);
+                bool CreateNewRoot = true;
+                string RootName = "2018";
+                int IterationStep = 7;
+
+                TeamProjects.Add("ITService", new List<string>());
+                TeamProjects["ITService"].Add("ITService Team");
+                TeamProjects["ITService"].Add("Команда 1");
+                TeamProjects["ITService"].Add("Команда 2");
+                TeamProjects["ITService"].Add("Команда 3");
+
+                if (CreateNewRoot)
+                    foreach (string TeamProjectName in TeamProjects.Keys)
+                    {
+                        TFClient.CreateIteration(TeamProjectName, RootName, DateTime.MinValue, DateTime.MinValue);
+                    }
+
+                while (FromDate.DayOfWeek != DayOfWeek.Monday) FromDate = FromDate.AddDays(1);
+
+                while (FromDate < ToDate)
+                {
+                    DateTime EndIteration = (FromDate.AddDays(IterationStep - 1) > ToDate) ? ToDate : FromDate.AddDays(IterationStep - 1);
+                    string IterationName = String.Format("wk. {0:00}.{1:00}-{2:00}.{3:00}", FromDate.Day, FromDate.Month, EndIteration.Day, EndIteration.Month);
+
+                    foreach (string TeamProjectName in TeamProjects.Keys)
+                    {
+                        var Iteration = TFClient.CreateIteration(TeamProjectName, IterationName, FromDate, EndIteration, RootName);
+
+                        if (TeamProjects[TeamProjectName].Count > 0)
+                        {
+                            foreach (string TeamName in TeamProjects[TeamProjectName]) TFClient.AddIterationToTeam(TeamProjectName, TeamName, Iteration);
+                        }
+                    }
+
+                    FromDate = FromDate.AddDays(IterationStep);
+                }
+            }
+            catch (Exception ex)
+            {
+                ScriptMessage = "Exception";
+                ScriptDetailedMessage = ex.Message + "\n" + ex.StackTrace;
+            }
+        }
+
         public static void UpdateSuccessors(TFClientHelper TFClient)
         {
             //"System.LinkTypes.Dependency-Reverse"

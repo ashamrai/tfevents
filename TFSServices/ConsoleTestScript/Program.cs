@@ -13,8 +13,14 @@ namespace ConsoleTestScript
     {
         static void Main(string[] args)
         {
-            TFClientHelper TFClient = new TFClientHelper(@"https://metpilot.visualstudio.com", @"whsnld4rrtkecjwf56tawt6gt5maj65xeagsblvqbbq3a66uudpq");
-            TestScript.Custom(TFClient);
+            if (args.Count() != 2)
+            {
+                Console.WriteLine("Use: ConsoleTestScript.exe vsts_url vsts_pat");
+                return;
+            }
+
+            TFClientHelper TFClient = new TFClientHelper(args[0], args[1]);
+            TestScript.CreateSprintsForEachWeek(TFClient);
         }        
     }
 }

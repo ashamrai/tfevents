@@ -88,15 +88,22 @@ namespace TFTaskService
                         {
                             foreach (var _rule in _rules)
                             {
-                                var _ruleToDelete = (from item in TaskTimers where item.Rule.id == _rule.id && item.Rule.rev != _rule.rev select item).FirstOrDefault();
+                                var RuleToUpdate = (from item in TaskTimers where item.Rule.id == _rule.id && item.Rule.rev != _rule.rev select item).FirstOrDefault();
 
-                                if (_ruleToDelete != null)
+                                if (RuleToUpdate != null)
                                 {
-                                    _ruleToDelete.Timer.Dispose();
-                                    TaskTimers.Remove(_ruleToDelete);
+                                    RuleToUpdate.Timer.Dispose();
+                                    TaskTimers.Remove(RuleToUpdate);
                                     AddTaskTimer(_rule, "updated");
                                 }
+                                else
+                                {
+                                    AddTaskTimer(_rule, "added");
+                                }
                             }
+
+                            RemoveInActiveTasks(_rules);
+
                         }
                     }
 
@@ -114,6 +121,26 @@ namespace TFTaskService
                 UpdatingRules = false;
                 _client.Dispose();
             }
+        }
+
+        private static void RemoveInActiveTasks(List<TFSServicesTypes.Rule> rules)
+        {
+            List<TaskTimer> ToDelete = new List<TaskTimer>();
+
+            foreach(var Task in TaskTimers)
+            {
+                var FindEctiveRule = (from item in rules where item.id == Task.Rule.id && item.rev == Task.Rule.rev select item).FirstOrDefault();
+
+                if (FindEctiveRule == null) ToDelete.Add(Task);
+            }
+
+            if (ToDelete.Count > 0)
+                foreach (var Task in ToDelete)
+                {
+                    Console.WriteLine(String.Format("Rule {0}: id {1}; rev {2}", "Removed", Task.Rule.id, Task.Rule.rev));
+                    Task.Timer.Dispose();
+                    TaskTimers.Remove(Task);
+                }
         }
 
         private static void AddTaskTimer(TFSServicesTypes.Rule pRule, string pOperation)

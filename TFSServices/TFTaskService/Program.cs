@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
@@ -27,6 +28,7 @@ namespace TFTaskService
 
         static void Main(string[] args)
         {
+            if (!Directory.Exists("Logs")) Directory.CreateDirectory("Logs");
             Timer _tmupdate = new Timer(UpdateRules, null, 0, 60000);
             Timer _tmhistory = new Timer(ClearHistory, null, 0, 86400000);
 
@@ -47,15 +49,23 @@ namespace TFTaskService
                 bool _result = StartRemoteTask(_client, String.Format(Properties.Settings.Default.PathHistoryClear, Properties.Settings.Default.HistoryDaysLeft)).Result;
 
             }
-            catch (Exception _ex)
+            catch (Exception ex)
             {
-
+                WriteLog(ex.Message, ex.StackTrace);
             }
             finally
             {
                 UpdatingRules = false;
                 _client.Dispose();
             }
+        }
+
+        static void WriteLog(string Message, string DetailedMessage = null)
+        {
+            string filename = String.Format("Logs\\{0}-{1:d2}-{2:d2}.txt", DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day);
+            string time = String.Format("{0:d2}:{1:d2}:{2:d2} ", DateTime.Now.Hour, DateTime.Now.Minute, DateTime.Now.Second);
+            File.AppendAllText(filename, time + Message + "\r\n");
+            if (DetailedMessage != null) File.AppendAllText(filename, DetailedMessage + "\r\n");
         }
 
         static void UpdateRules(object pParam)
@@ -112,9 +122,9 @@ namespace TFTaskService
                     UpdatingRules = false;
                 }
             }
-            catch (Exception _ex)
+            catch (Exception ex)
             {
-                
+                WriteLog(ex.Message, ex.StackTrace);
             }
             finally
             {
@@ -137,7 +147,7 @@ namespace TFTaskService
             if (ToDelete.Count > 0)
                 foreach (var Task in ToDelete)
                 {
-                    Console.WriteLine(String.Format("Rule {0}: id {1}; rev {2}", "Removed", Task.Rule.id, Task.Rule.rev));
+                    WriteLog(String.Format("Rule {0}: id {1}; rev {2}", "Removed", Task.Rule.id, Task.Rule.rev));
                     Task.Timer.Dispose();
                     TaskTimers.Remove(Task);
                 }
@@ -146,7 +156,7 @@ namespace TFTaskService
         private static void AddTaskTimer(TFSServicesTypes.Rule pRule, string pOperation)
         {
             TaskTimers.Add(new TaskTimer { Rule = pRule, Timer = new Timer(StartTask, pRule.id, GetShiftRun(pRule), GetStepRun(pRule)) });
-            Console.WriteLine(String.Format("Rule {0}: id {1}; rev {2}", pOperation, pRule.id, pRule.rev));
+            WriteLog(String.Format("Rule {0}: id {1}; rev {2}", pOperation, pRule.id, pRule.rev));
         }
 
         static int GetShiftRun(TFSServicesTypes.Rule pRule)
@@ -204,23 +214,20 @@ namespace TFTaskService
                     _client.DefaultRequestHeaders.Accept.Add(
                         new MediaTypeWithQualityHeaderValue("application/json"));
 
+                    WriteLog("Start tasks id:" + _id);
+
                     bool _result = StartRemoteTask(_client, String.Format(Properties.Settings.Default.PathRunTask, _id)).Result;
                 }
             }
-            catch(Exception _ex)
+            catch(Exception ex)
             {
-
+                WriteLog(ex.Message, ex.StackTrace);
             }
             finally
             {
                 _client.Dispose();
                 RuningRule = false;
             }
-        }
-
-        static bool StartTasks()
-        {
-            return true;
         }
 
         static async Task<int> GetWaterMark(HttpClient pClient, string pPath)

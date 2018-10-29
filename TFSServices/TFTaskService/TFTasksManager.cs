@@ -113,7 +113,9 @@ namespace TFTaskService
                                 }
                                 else
                                 {
-                                    AddTaskTimer(_rule, "added");
+                                    var RuleToAdd = (from item in TaskTimers where item.Rule.id == _rule.id && item.Rule.rev == _rule.rev select item).FirstOrDefault();
+
+                                    if (RuleToAdd == null) AddTaskTimer(_rule, "added");
                                 }
                             }
 
@@ -144,9 +146,9 @@ namespace TFTaskService
 
             foreach (var Task in TaskTimers)
             {
-                var FindEctiveRule = (from item in rules where item.id == Task.Rule.id && item.rev == Task.Rule.rev select item).FirstOrDefault();
+                var FindActiveRule = (from item in rules where item.id == Task.Rule.id && item.rev == Task.Rule.rev select item).FirstOrDefault();
 
-                if (FindEctiveRule == null) ToDelete.Add(Task);
+                if (FindActiveRule == null) ToDelete.Add(Task);
             }
 
             if (ToDelete.Count > 0)

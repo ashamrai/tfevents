@@ -1,7 +1,7 @@
 ﻿SET IDENTITY_INSERT [dbo].[RuleTypeSet] ON
-INSERT INTO [dbo].[RuleTypeSet] ([Id], [Name], [Description], [HasSchedule], [IsEvent]) VALUES (1, N'ScheduledTask', N'Scheduled Tasks', 0, 0)
+INSERT INTO [dbo].[RuleTypeSet] ([Id], [Name], [Description], [HasSchedule], [IsEvent]) VALUES (1, N'ScheduledTask', N'Scheduled Tasks', 1, 0)
 INSERT INTO [dbo].[RuleTypeSet] ([Id], [Name], [Description], [HasSchedule], [IsEvent]) VALUES (2, N'ManualTask', N'Task for manual run', 0, 0)
-INSERT INTO [dbo].[RuleTypeSet] ([Id], [Name], [Description], [HasSchedule], [IsEvent]) VALUES (3, N'WorkItemEvent', N'Process work item changes', 0, 0)
+INSERT INTO [dbo].[RuleTypeSet] ([Id], [Name], [Description], [HasSchedule], [IsEvent]) VALUES (3, N'WorkItemEvent', N'Process work item changes', 0, 1)
 SET IDENTITY_INSERT [dbo].[RuleTypeSet] OFF
 
 SET IDENTITY_INSERT [dbo].[ScheduleTypeSet] ON

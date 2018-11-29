@@ -21,7 +21,7 @@ namespace TFTaskService
         }
 
         bool UpdatingRules = false;
-        bool RuningRule = false;
+        bool RunningRule = false;
         int WaterMark = 0;
 
         Timer _tmupdate, _tmhistory;
@@ -90,7 +90,9 @@ namespace TFTaskService
                 {
                     UpdatingRules = true;
 
-                    while (RuningRule) { }
+                    while (RunningRule) { Thread.Sleep(1000); }
+
+                    Thread.Sleep(1000);
 
                     List<TFSServicesTypes.Rule> _rules = GetActiveTasks(_client, Properties.Settings.Default.PathGetActiveTasks).Result;
 
@@ -204,9 +206,11 @@ namespace TFTaskService
 
         void StartTask(object pTaskId)
         {
-            while (UpdatingRules || RuningRule) { }
+            while (UpdatingRules || RunningRule) { Thread.Sleep(1000); }
 
-            RuningRule = true;
+            RunningRule = true;
+
+            Thread.Sleep(1000);
 
             HttpClient _client = new HttpClient();
 
@@ -233,7 +237,7 @@ namespace TFTaskService
             finally
             {
                 _client.Dispose();
-                RuningRule = false;
+                RunningRule = false;
             }
         }
 

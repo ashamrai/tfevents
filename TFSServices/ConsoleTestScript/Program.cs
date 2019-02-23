@@ -19,8 +19,10 @@ namespace ConsoleTestScript
                 return;
             }
 
-            TFClientHelper TFClient = new TFClientHelper(args[0], args[1]);
-            TestScript.CreateSprintsForEachWeek(TFClient);
+
+            //TFClientHelper TFClient = new TFClientHelper(args[0], args[1]);
+            //TestScript.TestMailParse(TFClient);
+            //TestScript.UpdateTaskCompletedFromActivity(TFClient);
         }        
     }
 }

@@ -34,7 +34,16 @@ namespace TFSServices.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("https://metpilot.visualstudio.com")]
+        [global::System.Configuration.DefaultSettingValueAttribute("{ \"key\": \"value\" }")]
+        public string CustomSettingsJson {
+            get {
+                return ((string)(this["CustomSettingsJson"]));
+            }
+        }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
         public string ServiceUrl {
             get {
                 return ((string)(this["ServiceUrl"]));
@@ -43,7 +52,7 @@ namespace TFSServices.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("whsnld4rrtkecjwf56tawt6gt5maj65xeagsblvqbbq3a66uudpq")]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
         public string PAT {
             get {
                 return ((string)(this["PAT"]));

@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using TFHelper;
+using ScriptsPluginManagerLib;
 
 namespace ConsoleTestScript
 {
@@ -13,7 +14,7 @@ namespace ConsoleTestScript
     {
         static bool ScriptResult = true;
         static string ScriptMessage = "";
-        static string ScriptDetailedMessage = "";
+        static string ScriptDetailedMessage = "";        
 
         public static void CreateSprintsForEachWeek(TFClientHelper TFClient)
         {
@@ -27,10 +28,6 @@ namespace ConsoleTestScript
                 int IterationStep = 7;
 
                 TeamProjects.Add("ITService", new List<string>());
-                TeamProjects["ITService"].Add("ITService Team");
-                TeamProjects["ITService"].Add("Команда 1");
-                TeamProjects["ITService"].Add("Команда 2");
-                TeamProjects["ITService"].Add("Команда 3");
 
                 if (CreateNewRoot)
                     foreach (string TeamProjectName in TeamProjects.Keys)
@@ -96,8 +93,10 @@ namespace ConsoleTestScript
         public static void UpdateParentProposed(TFClientHelper TFClient)
         {
             string TFProject = "ITService";
+
             string Wiql = @"SELECT [System.Id] FROM WorkItemLinks WHERE ([Source].[System.TeamProject] = '" + TFProject +
-                @"' AND  [Source].[System.State] = 'Proposed') And ([System.Links.LinkType] = 'System.LinkTypes.Hierarchy-Forward') And ([Target].[System.WorkItemType] = 'Task'  AND  [Target].[System.State] = 'Active') ORDER BY [System.Id] mode(MustContain)";
+                @"' AND  [Source].[System.State] = 'Proposed') And ([System.Links.LinkType] = 'System.LinkTypes.Hierarchy-Forward')" +
+                @" And (([Target].[System.WorkItemType] = 'Task' OR [Target].[System.WorkItemType] = 'Requirement' OR [Target].[System.WorkItemType] = 'Stage')  AND  [Target].[System.State] = 'Active') ORDER BY [System.Id] mode(MustContain)";
 
             var WiqlResult = TFClient.GetWorkItemListWithWIQL(Wiql, TFProject);
             var TopLevelIds = TFClient.GetTopLevelWorkItemIds(WiqlResult);
@@ -119,7 +118,33 @@ namespace ConsoleTestScript
                 ScriptMessage = "Without changes";
         }
 
-        public static void Custom(TFClientHelper TFClient)
+        public static void ActivateParentTask(TFClientHelper TFClient)
+        {
+            string TFProject = "ITService";
+            string Wiql = @"SELECT [System.Id] FROM WorkItemLinks WHERE ([Source].[System.TeamProject] = '" + TFProject +
+                @"' AND  [Source].[System.State] = 'Proposed') And ([System.Links.LinkType] = 'System.LinkTypes.Hierarchy-Forward') And ([Target].[System.WorkItemType] = 'Activity')  ORDER BY [System.Id] mode(MustContain)";
+
+            var WiqlResult = TFClient.GetWorkItemListWithWIQL(Wiql, TFProject);
+            var TopLevelIds = TFClient.GetTopLevelWorkItemIds(WiqlResult);
+
+            foreach (int Id in TopLevelIds)
+            {
+                Dictionary<string, string> Fields = new Dictionary<string, string>();
+                Fields.Add("State", "Active");
+                var workItem = TFClient.UpdateWorkItem(Id, Fields);
+                ScriptDetailedMessage += Id + ";";
+            }
+
+            if (ScriptDetailedMessage != "")
+            {
+                ScriptDetailedMessage = "Updated work items: " + ScriptDetailedMessage;
+                ScriptMessage = "Work items was updated";
+            }
+            else
+                ScriptMessage = "Without changes";
+        }
+
+        public static void SetCurrentIteration(TFClientHelper TFClient)
         {
             try
             {
@@ -179,9 +204,9 @@ namespace ConsoleTestScript
                
                 string TFProject = "ITService";
                 DateTime ChahgedDate = DateTime.UtcNow.AddDays(-7);
-                string Wiql = @"SELECT [System.Id] FROM WorkItemLinks WHERE ([Source].[System.TeamProject] = '" + TFProject +
-                    @"' AND  [Source].[System.WorkItemType] = 'Task') And ([System.Links.LinkType] = 'System.LinkTypes.Hierarchy-Forward') And ([Target].[System.WorkItemType] = 'Activity'  AND  [Target].[System.ChangedDate] >'" + ChahgedDate.ToShortDateString() +
-                    @"') ORDER BY [System.Id] mode(MustContain)";
+                string Wiql = @"SELECT [System.Id] FROM WorkItemLinks WHERE ([Source].[System.TeamProject] = @project" +
+                    @" AND  [Source].[System.WorkItemType] = 'Task') And ([System.Links.LinkType] = 'System.LinkTypes.Hierarchy-Forward') And ([Target].[System.WorkItemType] = 'Activity'  AND  [Target].[System.ChangedDate] > @Today-30" +
+                    @") ORDER BY [System.Id] mode(MustContain)";
 
                 
                 var WiqlResult = TFClient.GetWorkItemListWithWIQL(Wiql, TFProject);
@@ -237,5 +262,7 @@ namespace ConsoleTestScript
                 ScriptDetailedMessage = ex.Message + "\n" + ex.StackTrace;
             }
         }
+
+
     }
 }

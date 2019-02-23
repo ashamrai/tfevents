@@ -15,6 +15,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TFSServicesDBLib", "TFSServ
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TFTaskService", "TFTaskService\TFTaskService.csproj", "{84D2AFC2-3C02-404C-A37D-5DA9942E500D}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ScriptsPluginManagerLib", "ScriptsPluginManagerLib\ScriptsPluginManagerLib.csproj", "{BECA29BE-9121-4697-98B8-B08008869B73}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -71,6 +73,14 @@ Global
 		{84D2AFC2-3C02-404C-A37D-5DA9942E500D}.Release|Any CPU.Build.0 = Release|Any CPU
 		{84D2AFC2-3C02-404C-A37D-5DA9942E500D}.Release|x64.ActiveCfg = Release|Any CPU
 		{84D2AFC2-3C02-404C-A37D-5DA9942E500D}.Release|x64.Build.0 = Release|Any CPU
+		{BECA29BE-9121-4697-98B8-B08008869B73}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BECA29BE-9121-4697-98B8-B08008869B73}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BECA29BE-9121-4697-98B8-B08008869B73}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{BECA29BE-9121-4697-98B8-B08008869B73}.Debug|x64.Build.0 = Debug|Any CPU
+		{BECA29BE-9121-4697-98B8-B08008869B73}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BECA29BE-9121-4697-98B8-B08008869B73}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BECA29BE-9121-4697-98B8-B08008869B73}.Release|x64.ActiveCfg = Release|Any CPU
+		{BECA29BE-9121-4697-98B8-B08008869B73}.Release|x64.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

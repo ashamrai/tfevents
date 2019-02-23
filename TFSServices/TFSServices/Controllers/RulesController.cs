@@ -192,8 +192,8 @@ namespace TFSServices.Controllers
         {
             var _srcs = new ScriptsEngineLib.ScriptsEngine(Properties.Settings.Default.ServiceUrl, Properties.Settings.Default.PAT);
             _srcs.Debug = Properties.Settings.Default.Debug;
-
-            _srcs.RunTaskScript(id);
+            if (_srcs.SetCustomSettings(Properties.Settings.Default.CustomSettingsJson))
+                _srcs.RunTaskScript(id);
 
             return RedirectToAction("Index", "RunHistories");
         }

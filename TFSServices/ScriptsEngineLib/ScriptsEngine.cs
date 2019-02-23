@@ -12,6 +12,8 @@ using Microsoft.VisualStudio.Services.WebApi;
 using Microsoft.VisualStudio.Services.WebApi.Patch;
 using Microsoft.VisualStudio.Services.WebApi.Patch.Json;
 using TFHelper;
+using ScriptsPluginManagerLib;
+using Newtonsoft.Json;
 
 namespace ScriptsEngineLib
 {
@@ -19,9 +21,10 @@ namespace ScriptsEngineLib
     {
         public class Globals
         {
-            public bool ScriptResult;
-            public string ScriptMessage;
+            public Dictionary<string, string> CustomSettings;
         }
+
+        public Dictionary<string, string> CustomSettings { get; set; }
 
 
         TFSServicesDBLib.DBHelper DBConnection = new TFSServicesDBLib.DBHelper();
@@ -77,14 +80,7 @@ namespace ScriptsEngineLib
 
             try
             {
-                var _scrOpt = ScriptOptions.Default.AddReferences(
-                    Assembly.GetAssembly(typeof(WorkItemEvent.WorkItemEventUpdated)),
-                    Assembly.GetAssembly(typeof(System.Collections.Generic.Dictionary<string, string>))
-                    ).AddImports(
-                    "System",
-                    "System.Collections.Generic",
-                    "TFHelperLib"
-                    );
+                var _scrOpt = GetOptions();
 
                 string _srcHeader = @"bool CheckConditionUpdated(WorkItemEvent.WorkItemEventUpdated InputWorkItem){
 ";
@@ -116,21 +112,7 @@ CheckConditionUpdated(InputWorkItem)";
             {
                 if (Debug) DBConnection.AddRunHistory(pRule, "Start run: " + pRule.Title, TypesHelper.Serialize(pInputWorkItem));
 
-                var _scrOpt = ScriptOptions.Default.AddReferences(
-                    Assembly.GetAssembly(typeof(WorkItemTrackingHttpClient)),
-                    Assembly.GetAssembly(typeof(JsonPatchDocument)),
-                    Assembly.GetAssembly(typeof(VssCredentials)),
-                    Assembly.GetAssembly(typeof(WorkItemEvent.WorkItemEventUpdated)),
-                    Assembly.GetAssembly(typeof(Uri))
-                    ).AddImports(
-                    "Microsoft.TeamFoundation.WorkItemTracking.WebApi",
-                    "Microsoft.TeamFoundation.WorkItemTracking.WebApi.Models",
-                    "Microsoft.VisualStudio.Services.WebApi.Patch.Json",
-                    "Microsoft.VisualStudio.Services.WebApi.Patch",
-                    "Microsoft.VisualStudio.Services.Common",
-                    "System",
-                    "TFHelper"
-                    );
+                var _scrOpt = GetOptions();
 
 
                 string _srcHeader = @"string ProcessEvent(WorkItemEvent.WorkItemEventUpdated InputWorkItem){";
@@ -172,32 +154,9 @@ ProcessEvent(InputWorkItem)";
             {
                 if (Debug) DBConnection.AddRunHistory(_rule, "Start run", "");
 
-                var _globals = new Globals { ScriptResult = true, ScriptMessage = "" };
+                var _globals = new Globals { /*ScriptResult = true, ScriptMessage = "",*/ CustomSettings = CustomSettings };
 
-                var _scrOpt = ScriptOptions.Default.AddReferences(
-                    Assembly.GetAssembly(typeof(TeamSettingsIteration)),
-                    Assembly.GetAssembly(typeof(WorkItemTrackingHttpClient)),
-                    Assembly.GetAssembly(typeof(Exception)),
-                    Assembly.GetAssembly(typeof(WorkItem)),
-                    Assembly.GetAssembly(typeof(JsonPatchDocument)),
-                    Assembly.GetAssembly(typeof(VssConnection)),
-                    Assembly.GetAssembly(typeof(VssBasicCredential)),
-                    Assembly.GetAssembly(typeof(Uri)),
-                    Assembly.GetAssembly(typeof(TFClientHelper)),
-                     Assembly.GetAssembly(typeof(Dictionary<string, string>))
-                    ).AddImports(
-                    "Microsoft.TeamFoundation.Work.WebApi",
-                    "Microsoft.TeamFoundation.WorkItemTracking.WebApi",
-                    "Microsoft.TeamFoundation.WorkItemTracking.WebApi.Models",
-                    "Microsoft.VisualStudio.Services.WebApi.Patch.Json",
-                    "Microsoft.VisualStudio.Services.WebApi.Patch",
-                    "Microsoft.VisualStudio.Services.WebApi",
-                    "Microsoft.VisualStudio.Services.Common",
-                    "TFHelper",
-                    "System",
-                    "System.Exception",
-                    "System.Collections.Generic"
-                    );
+                var _scrOpt = GetOptions();
 
 
                 string _srcHeader = @"bool ScriptResult = true;
@@ -207,6 +166,8 @@ string ScriptDetailedMessage = """";
 void ProcessEvent(){
 try
 {
+PluginManager PluginManager = new PluginManager();
+PluginManager.Initialize();
 ";
                 string _srcGetClients = @"TFClientHelper TFClient = new TFClientHelper(""" + ServiceUrl + @""", """ + PAT + @""");
 ";
@@ -222,7 +183,7 @@ ProcessEvent()";
 
                 string _src = _srcHeader + _srcGetClients + _rule.ProcessScript + _srcEnd;
 
-                var _scriptResult = CSharpScript.RunAsync<bool>(_src, _scrOpt).Result;
+                var _scriptResult = CSharpScript.RunAsync<bool>(_src, _scrOpt, _globals).Result;
 
                 if ( _scriptResult.Variables.Length == 3)
                 {
@@ -231,6 +192,7 @@ ProcessEvent()";
                     _scriptDetailedMessage = (string)_scriptResult.Variables[2].Value;
 
                     if (Debug) DBConnection.AddRunHistory(_rule, "End run: " + _scriptMessage, _scriptDetailedMessage);
+                    else DBConnection.AddRunHistory(_rule, (_result)? "Success" : "Fail", _scriptMessage + "\n\n" + _scriptDetailedMessage);
                 }
                 else
                     DBConnection.AddRunHistory(_rule, "Script did not return all globals", "");
@@ -238,11 +200,60 @@ ProcessEvent()";
             }
             catch (Exception ex)
             {
-                if (Debug) DBConnection.AddRunHistory(_rule, "Script exception", ex.Message + "\n\n" + ex.StackTrace);
+                DBConnection.AddRunHistory(_rule, "Script exception", ex.Message + "\n\n" + ex.StackTrace);
                 _result = false;
             }
 
             return _result;
+        }
+
+        ScriptOptions GetOptions()
+        {
+            return ScriptOptions.Default.AddReferences(
+                    Assembly.GetAssembly(typeof(TeamSettingsIteration)),
+                    Assembly.GetAssembly(typeof(WorkItemTrackingHttpClient)),
+                    Assembly.GetAssembly(typeof(Exception)),
+                    Assembly.GetAssembly(typeof(WorkItem)),
+                    Assembly.GetAssembly(typeof(JsonPatchDocument)),
+                    Assembly.GetAssembly(typeof(VssConnection)),
+                    Assembly.GetAssembly(typeof(VssBasicCredential)),
+                    Assembly.GetAssembly(typeof(Uri)),
+                    Assembly.GetAssembly(typeof(TFClientHelper)),
+                    Assembly.GetAssembly(typeof(PluginManager))
+                    ).AddImports(
+                    "Microsoft.TeamFoundation.Work.WebApi",
+                    "Microsoft.TeamFoundation.WorkItemTracking.WebApi",
+                    "Microsoft.TeamFoundation.WorkItemTracking.WebApi.Models",
+                    "Microsoft.VisualStudio.Services.WebApi.Patch.Json",
+                    "Microsoft.VisualStudio.Services.WebApi.Patch",
+                    "Microsoft.VisualStudio.Services.WebApi",
+                    "Microsoft.VisualStudio.Services.Common",
+                    "TFHelper",
+                    "ScriptsPluginManagerLib",
+                    "System",
+                    "System.Exception",
+                    "System.Collections.Generic"
+                    );
+        }
+
+        public bool SetCustomSettings(string SettingsJson)
+        {
+            Dictionary<string, string> _settings;
+            try
+            {
+                if (SettingsJson == "") return true;
+
+                _settings = JsonConvert.DeserializeObject<Dictionary<string, string>>(SettingsJson);
+            }
+            catch(Exception ex)
+            {
+                DBConnection.AddRunHistory(null, "Can not parse custom settings", ex.Message + "\n\n" + ex.StackTrace);
+                return false;
+            }
+
+            CustomSettings = _settings;
+
+            return true;
         }
     }
 }

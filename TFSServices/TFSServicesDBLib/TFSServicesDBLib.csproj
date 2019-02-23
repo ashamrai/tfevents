@@ -11,6 +11,7 @@
     <AssemblyName>TFSServicesDBLib</AssemblyName>
     <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
+    <IsWebBootstrapper>false</IsWebBootstrapper>
     <PublishUrl>publish\</PublishUrl>
     <Install>true</Install>
     <InstallFrom>Disk</InstallFrom>
@@ -23,7 +24,6 @@
     <MapFileExtensions>true</MapFileExtensions>
     <ApplicationRevision>0</ApplicationRevision>
     <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
-    <IsWebBootstrapper>false</IsWebBootstrapper>
     <UseApplicationTrust>false</UseApplicationTrust>
     <BootstrapperEnabled>true</BootstrapperEnabled>
   </PropertyGroup>
@@ -109,10 +109,17 @@
       <LastGenOutput>TFSServicesDB.Context.cs</LastGenOutput>
     </Content>
     <Content Include="TFSServicesDB.edmx.sql" />
+    <Content Include="TFSServicesDB.mdf">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Include="TFSServicesDB.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
       <DependentUpon>TFSServicesDB.edmx</DependentUpon>
       <LastGenOutput>TFSServicesDB.cs</LastGenOutput>
+    </Content>
+    <Content Include="TFSServicesDB_log.ldf">
+      <DependentUpon>TFSServicesDB.mdf</DependentUpon>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
   <ItemGroup>
@@ -121,7 +128,9 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
-    <None Include="App.config" />
+    <None Include="App.config">
+      <SubType>Designer</SubType>
+    </None>
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>

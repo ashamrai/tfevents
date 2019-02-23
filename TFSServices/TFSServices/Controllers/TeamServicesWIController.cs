@@ -30,8 +30,8 @@ namespace TFSServices.Controllers
         {
             var _srcs = new ScriptsEngineLib.ScriptsEngine(Properties.Settings.Default.ServiceUrl, Properties.Settings.Default.PAT);
             _srcs.Debug = Properties.Settings.Default.Debug;
-            
-            _srcs.RunTaskScript(pTaskId);
+            if (_srcs.SetCustomSettings(Properties.Settings.Default.CustomSettingsJson))
+                _srcs.RunTaskScript(pTaskId);
 
             return true;
         }
@@ -81,7 +81,8 @@ namespace TFSServices.Controllers
         {
             var _srcs = new ScriptsEngineLib.ScriptsEngine(Properties.Settings.Default.ServiceUrl, Properties.Settings.Default.PAT);
             _srcs.Debug = Properties.Settings.Default.Debug;
-            _srcs.ProcessWokItemUpdatedEvent(value);
+            if (_srcs.SetCustomSettings(Properties.Settings.Default.CustomSettingsJson))
+                _srcs.ProcessWokItemUpdatedEvent(value);
         }
     }
 

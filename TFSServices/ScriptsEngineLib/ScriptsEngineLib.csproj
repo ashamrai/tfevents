@@ -217,6 +217,10 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\ScriptsPluginManagerLib\ScriptsPluginManagerLib.csproj">
+      <Project>{beca29be-9121-4697-98b8-b08008869b73}</Project>
+      <Name>ScriptsPluginManagerLib</Name>
+    </ProjectReference>
     <ProjectReference Include="..\TFSServicesDBLib\TFSServicesDBLib.csproj">
       <Project>{90f65d42-ce10-41fc-bb4e-959afaac1d3c}</Project>
       <Name>TFSServicesDBLib</Name>

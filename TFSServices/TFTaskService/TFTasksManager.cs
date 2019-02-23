@@ -67,10 +67,15 @@ namespace TFTaskService
 
         void WriteLog(string Message, string DetailedMessage = null)
         {
-            string filename = String.Format("Logs\\{0}-{1:d2}-{2:d2}.txt", DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day);
-            string time = String.Format("{0:d2}:{1:d2}:{2:d2} ", DateTime.Now.Hour, DateTime.Now.Minute, DateTime.Now.Second);
-            File.AppendAllText(filename, time + Message + "\r\n");
-            if (DetailedMessage != null) File.AppendAllText(filename, DetailedMessage + "\r\n");
+            try
+            {
+                string filename = String.Format("Logs\\{0}-{1:d2}-{2:d2}.txt", DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day);
+                string time = String.Format("{0:d2}:{1:d2}:{2:d2} ", DateTime.Now.Hour, DateTime.Now.Minute, DateTime.Now.Second);
+                File.AppendAllText(filename, time + Message + "\r\n");
+                if (DetailedMessage != null) File.AppendAllText(filename, DetailedMessage + "\r\n");
+            }
+            catch(Exception ex)
+            { }
         }
 
         void UpdateRules(object pParam)

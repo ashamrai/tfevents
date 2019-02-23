@@ -134,6 +134,10 @@
       <Project>{07304e37-647c-4835-abe4-7e55d76f177a}</Project>
       <Name>ScriptsEngineLib</Name>
     </ProjectReference>
+    <ProjectReference Include="..\ScriptsPluginManagerLib\ScriptsPluginManagerLib.csproj">
+      <Project>{beca29be-9121-4697-98b8-b08008869b73}</Project>
+      <Name>ScriptsPluginManagerLib</Name>
+    </ProjectReference>
     <ProjectReference Include="..\TFTypesLib\TFHelper.csproj">
       <Project>{7a5c47dc-2ed7-4d43-9839-f7918b0041ce}</Project>
       <Name>TFHelper</Name>

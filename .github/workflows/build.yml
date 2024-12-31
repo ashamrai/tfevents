@@ -17,4 +17,4 @@ jobs:
         with:
           azcliversion: latest
           inlineScript: |
-            az account show
+            az acr login --name ${{ vars.AZURE_ACR_NAME }}
